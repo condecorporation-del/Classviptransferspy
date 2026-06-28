@@ -37,6 +37,7 @@ COPY pyproject.toml README.md ./
 COPY app ./app
 COPY alembic ./alembic
 COPY alembic.ini ./alembic.ini
+COPY scripts ./scripts
 RUN pip install .
 
 # ─── Usuario no-root ──────────────────────────────────────────────────────────
