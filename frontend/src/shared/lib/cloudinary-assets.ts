@@ -10,7 +10,10 @@ export const cloudinaryAssets = {
   icon192: `https://res.cloudinary.com/dt9iyiorn/image/upload/${T}/v1774175172/classvip/icon-192.png`,
   icon512: `https://res.cloudinary.com/dt9iyiorn/image/upload/${T}/v1774175173/classvip/icon-512.png`,
   appleTouchIcon: `https://res.cloudinary.com/dt9iyiorn/image/upload/${T}/v1774175173/classvip/apple-touch-icon.png`,
-  hero: ['https://res.cloudinary.com/dt9iyiorn/image/upload/v1774175174/classvip/hero-1.jpg', 'https://res.cloudinary.com/dt9iyiorn/image/upload/v1774175175/classvip/hero-2.jpg', 'https://res.cloudinary.com/dt9iyiorn/image/upload/v1774175178/classvip/hero-3.jpg'].filter(Boolean),
+  // Hero: el transform q_auto:good,f_auto hace que Cloudinary sirva WebP/AVIF
+  // comprimido en vez del JPG crudo. Es la imagen LCP (full-screen) — el mayor
+  // factor de velocidad de la home en Core Web Vitals.
+  hero: [`https://res.cloudinary.com/dt9iyiorn/image/upload/${T}/v1774175174/classvip/hero-1.jpg`, `https://res.cloudinary.com/dt9iyiorn/image/upload/${T}/v1774175175/classvip/hero-2.jpg`, `https://res.cloudinary.com/dt9iyiorn/image/upload/${T}/v1774175178/classvip/hero-3.jpg`].filter(Boolean),
   activities: {
     atv: 'https://cactustours.com.mx/wp-content/uploads/2024/03/3_Beach-and-Dunes-ATV.webp',
     camel: 'https://cactustours.com.mx/wp-content/uploads/2024/03/Cactus-tours-camel-ride-miniatura.webp',
