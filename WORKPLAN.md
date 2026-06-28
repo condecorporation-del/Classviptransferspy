@@ -1260,6 +1260,42 @@ reiniciado con el código nuevo (health 200, login 200, `/pricing/rules` 404). S
 (no analiza) y los `references/*.md` son plantillas placeholder. La revisión/calificación (B+ → mejorada
 con esta fase) se hizo con herramientas reales (ruff/pytest/tsc), no con ese skill.
 
+## Fase 31r — Fix login admin en celular (cookie cross-site) + auditoría responsive (28 jun 2026)
+
+**Síntoma (Marlon):** no podía hacer login al admin desde el celular (en compu sí).
+
+**Causa raíz:** el panel autenticaba SOLO con la cookie httpOnly `admin_token`. Frontend (Vercel /
+`www.classviptransfers.com`) y backend (Railway) están en dominios DISTINTOS → la cookie es
+**cross-site**. Safari iOS (ITP) y Chrome móvil **bloquean** las cookies cross-site: el login
+respondía 200 pero la cookie nunca se guardaba y `/me` daba 401 → no se podía entrar en el celular.
+En desktop Chrome sí funcionaba (aún permite cross-site con `samesite=none; secure`).
+
+**Fix (el backend YA aceptaba `Authorization: Bearer` en `AdminAuthMiddleware`):**
+- `adminSession.ts`: guarda/lee/borra el JWT en `localStorage` (antes eran no-ops).
+- `AdminLogin.tsx`: guarda `access_token` de la respuesta del login.
+- `useAdminAuth.ts`: `/me` y `getAuthHeaders()` mandan `Authorization: Bearer <token>`. Se mantiene
+  `credentials: 'include'` (cookie) como respaldo en desktop.
+- Todos los componentes del admin (Bookings, Finanzas, Accounts, RRHH, Tareas, Marketing, Pricing,
+  Dashboard, Admin.tsx) YA usan `getAuthHeaders()`, así que todas sus peticiones llevan el token.
+- **Verificado en producción:** login → token → `/me` y `/admin/bookings` con SOLO el header (sin
+  cookie, como en celular) → 200. Funciona en todos los dispositivos.
+- ⚠️ Nota de seguridad: el token en localStorage es vulnerable a XSS (vs httpOnly). Trade-off
+  aceptado porque la cookie cross-site simplemente no funciona en móvil. Alternativa "más correcta" a
+  futuro: poner el backend en `api.classviptransfers.com` (subdominio del front) → cookie first-party
+  con `domain=.classviptransfers.com; samesite=lax`. Requiere dominio custom en Railway (DNS).
+
+**Auditoría responsive (revisado, sin cambios necesarios):**
+- Shell del admin: nav inferior fija en móvil (`md:hidden`), sidebar oculto en móvil
+  (`hidden md:flex`), menú overlay, grids `grid-cols-1 sm:grid-cols-3`, contenido con
+  `overflow-auto pb-20`. ✅ responsive.
+- Tablas grandes (AdminBookings, FinanzasTab): `hidden md:block` con vista de tarjetas alternativa en
+  móvil. PricingManager: `overflow-x-auto` con `min-w`. ✅ no se desbordan.
+- Login (`AdminLogin.tsx`): `min-h-[100dvh]`, padding responsive, `max-w-md`. ✅
+- Páginas públicas: usan breakpoints `sm/md/lg` en todo (hero, grids, tipografía). Marlon confirmó
+  que se ven bien. **Pendiente opcional:** pasada fina con DevTools móvil real si surge algún detalle.
+
+---
+
 ## Fase 31q — IVA 16% en reservas, checkout, confirmaciones y correos (28 jun 2026)
 
 **Pedido de Marlon:** agregar 16% de IVA, que se vea en la confirmación y que al pagar diga
