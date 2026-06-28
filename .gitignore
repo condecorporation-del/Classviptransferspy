@@ -1,0 +1,43 @@
+# ─── Secretos — NUNCA subir ───
+.env
+.env.local
+*.env
+!.env.example
+# Cookies de curl / tokens volcados a disco (ej. `curl -c -X archivo`)
+-X
+*.cookie
+cookies*.txt
+*.cookies
+
+# ─── Python ───
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# ─── Node / frontend ───
+node_modules/
+dist/
+.vite/
+
+# ─── Editores / OS ───
+.vscode/
+.idea/
+.DS_Store
+
+# ─── Hermes (estado local del agente) ───
+.hermes/
+
+# ─── Scripts temporales de inspección (nunca deben commitearse) ───
+_tmp_*.py
+_inspect_*.py
+
+# ─── Metadata de Windows (WSL) ───
+*:Zone.Identifier

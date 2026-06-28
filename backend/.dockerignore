@@ -1,0 +1,24 @@
+# No copiar al contexto de build cosas pesadas, locales o secretas.
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+*.egg-info/
+
+# Secretos — NUNCA dentro de la imagen
+.env
+.env.*
+!.env.example
+
+# Archivos de desarrollo / basura
+-X
+*.cookie
+cookies*.txt
+scripts/data/
+README.md.bak

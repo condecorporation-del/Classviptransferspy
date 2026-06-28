@@ -1,0 +1,52 @@
+{# Bloque de una pierna operativa (LLEGADA / SALIDA). Requiere la variable `leg`.
+   LLEGADA: Aeropuerto SJD -> Hotel. SALIDA: Hotel -> Aeropuerto, hora = PICKUP
+   (3h antes del vuelo de salida). Mismo criterio que el PDF. #}
+{% set is_departure = leg.type == 'departure' %}
+{% set accent = '#c0392b' if is_departure else ('#2e9e5b' if leg.type == 'arrival' else '#475569') %}
+{% set bg = '#fdeceb' if is_departure else ('#eafaf0' if leg.type == 'arrival' else '#f1f5f9') %}
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom:14px;border-radius:10px;overflow:hidden;border:1px solid #e2e8f0;border-left:4px solid {{ accent }};">
+  <tr>
+    <td style="padding:10px 16px;background:{{ bg }};">
+      <p style="margin:0;font-size:11px;font-weight:800;letter-spacing:1px;color:{{ accent }};">
+        {% if leg.type == 'arrival' %}✈ LLEGADA · ARRIVAL{% elif is_departure %}✈ SALIDA · DEPARTURE{% else %}SERVICIO · SERVICE{% endif %}
+        {% if leg.service_date %} — {{ leg.service_date }}{% endif %}
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td style="padding:12px 16px;">
+      <!-- Hora del servicio -->
+      <p style="margin:0 0 2px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;">
+        {% if is_departure %}Pickup Time · Hora de Recogida (3h antes del vuelo){% else %}Arrival / Service Time · Hora{% endif %}
+      </p>
+      <p style="margin:0 0 10px;font-size:18px;font-weight:800;color:#071A2B;">{{ leg.service_time or 'TBD' }}</p>
+
+      <!-- Ruta -->
+      <p style="margin:0 0 2px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;">Route · Ruta</p>
+      <p style="margin:0 0 10px;font-size:14px;font-weight:600;color:#1e293b;">{{ leg.origin or '—' }} &nbsp;→&nbsp; {{ leg.destination or '—' }}</p>
+
+      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+        {% if leg.flight %}
+        <tr>
+          <td width="50%" style="padding:0 12px 6px 0;vertical-align:top;" class="col">
+            <p style="margin:0 0 2px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;">Flight · Vuelo</p>
+            <p style="margin:0;font-size:14px;color:#1e293b;">{{ leg.flight }}</p>
+          </td>
+          <td width="50%" style="padding:0 0 6px;vertical-align:top;" class="col">
+            <p style="margin:0 0 2px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;">Flight Time · Hora del Vuelo</p>
+            <p style="margin:0;font-size:14px;color:#1e293b;">{{ leg.flight_time or '—' }}</p>
+          </td>
+        </tr>
+        {% endif %}
+        {% if leg.airline %}
+        <tr>
+          <td colspan="2" style="padding:0 0 4px;vertical-align:top;">
+            <p style="margin:0 0 2px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;">Airline · Aerolínea</p>
+            <p style="margin:0;font-size:14px;color:#1e293b;">{{ leg.airline }}</p>
+          </td>
+        </tr>
+        {% endif %}
+      </table>
+    </td>
+  </tr>
+</table>

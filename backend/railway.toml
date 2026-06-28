@@ -1,0 +1,16 @@
+# Configuración de Railway para el servicio backend.
+# IMPORTANTE: en Railway, este servicio debe tener "Root Directory" = backend
+# (Settings → Source) para que este archivo y el Dockerfile se detecten.
+
+[build]
+builder = "dockerfile"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+# Health check: Railway no manda tráfico hasta que /health responda 200.
+# Usa el endpoint de liveness (no toca la DB) — ver app/main.py.
+healthcheckPath = "/health"
+healthcheckTimeout = 100
+# Si el proceso muere, reiniciar (hasta 3 veces) en vez de quedar caído.
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3

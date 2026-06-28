@@ -1,0 +1,53 @@
+# Stack de DESARROLLO local (Postgres + Redis en contenedores).
+# En producción real (Railway) NO se usa este archivo — Railway construye
+# el backend directo desde docker/Dockerfile.backend y la DB es Supabase,
+# inyectada por variables de entorno del propio Railway (ver WORKPLAN.md,
+# Fase 12, Bloque 4). Por eso aquí ENVIRONMENT=development a propósito:
+# así el arranque NO exige los valores de producción (T5 — fail-fast).
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: classvip
+      POSTGRES_USER: classvip
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-classvip_dev}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U classvip -d classvip"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  backend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.backend
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://classvip:${DB_PASSWORD:-classvip_dev}@db:5432/classvip
+      - REDIS_URL=redis://redis:6379/0
+      - SECRET_KEY=${SECRET_KEY:?Define SECRET_KEY en tu .env, sin default inseguro}
+      - ENVIRONMENT=development
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  pgdata:

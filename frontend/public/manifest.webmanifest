@@ -1,0 +1,50 @@
+{
+  "name": "Class VIP Transfers",
+  "short_name": "Class VIP",
+  "description": "Luxury Transportation & Experiences in Los Cabos",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0A0A0A",
+  "theme_color": "#071A2B",
+  "orientation": "portrait",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto:good,f_auto/v1774175172/classvip/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto:good,f_auto/v1774175173/classvip/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto:good,f_auto/v1774175173/classvip/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["travel", "transportation"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Book Transfer",
+      "short_name": "Transfer",
+      "description": "Book a luxury transfer",
+      "url": "/book",
+      "icons": [{ "src": "https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto:good,f_auto/v1774175172/classvip/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Book Activity",
+      "short_name": "Activity",
+      "description": "Book an adventure activity",
+      "url": "/book-activities",
+      "icons": [{ "src": "https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto:good,f_auto/v1774175172/classvip/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
+

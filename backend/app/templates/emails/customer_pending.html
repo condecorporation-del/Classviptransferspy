@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="color-scheme" content="light">
+  <meta name="x-apple-disable-message-reformatting">
+  <title>Booking Received — Pending Payment | {{ brand_name }}</title>
+  <style type="text/css">
+    @media only screen and (max-width: 620px) {
+      .ep  { padding-left: 16px !important; padding-right: 16px !important; }
+      .col { display: block !important; width: 100% !important; }
+    }
+  </style>
+</head>
+<body style="margin:0;padding:0;background-color:#f0f2f5;font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;font-size:14px;line-height:1.55;color:#1e293b;">
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background:#f0f2f5;">
+<tr><td align="center" style="padding:24px 12px 36px;">
+
+  <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="620" style="max-width:620px;width:100%;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 32px rgba(7,26,43,0.10);">
+
+    <!-- HEADER -->
+    <tr>
+      <td style="padding:0;">
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+          <tr>
+            <td style="padding:22px 28px;background-color:#071A2B;" class="ep">
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                <tr>
+                  <td style="vertical-align:middle;">
+                    {% if logo_url %}<img src="{{ logo_url }}" alt="{{ brand_name }}" height="52" style="height:52px;width:auto;display:block;max-width:180px;" />
+                    {% else %}<p style="margin:0;font-size:20px;font-weight:800;color:#fff;">{{ brand_name }}</p>{% endif %}
+                  </td>
+                  <td align="right" style="vertical-align:middle;">
+                    <p style="margin:0;font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:#D9AE5F;font-weight:700;">Luxury Transportation</p>
+                    <p style="margin:3px 0 0;font-size:12px;color:rgba(255,255,255,0.65);">Los Cabos, México</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr><td style="height:3px;background:linear-gradient(90deg,#D9AE5F,#f5d78a,#D9AE5F);"></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <!-- STATUS BADGE -->
+    <tr>
+      <td align="center" style="padding:28px 28px 16px;" class="ep">
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0">
+          <tr>
+            <td style="background:#fffbeb;border:1.5px solid #F59E0B;border-radius:10px;padding:16px 28px;text-align:center;">
+              <p style="margin:0 0 3px;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#92400e;font-weight:700;">⏳ Booking Received — Pending Payment · Pago Pendiente</p>
+              <p style="margin:0;font-size:26px;font-weight:900;color:#071A2B;letter-spacing:3px;font-family:monospace;">{{ confirmation_code }}</p>
+            </td>
+          </tr>
+        </table>
+        <p style="margin:14px 0 0;font-size:15px;font-weight:600;color:#071A2B;">Thank you, {{ customer_name }}!</p>
+        <p style="margin:4px 0 0;font-size:13px;color:#64748b;">Your booking is reserved. Complete payment to confirm it · Completa el pago para confirmar.</p>
+      </td>
+    </tr>
+
+    <!-- PAYMENT CTA -->
+    {% if payment_url %}
+    <tr>
+      <td style="padding:0 24px 20px;" class="ep">
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background:#fffbeb;border:1.5px solid #F59E0B;border-radius:12px;">
+          <tr>
+            <td align="center" style="padding:22px 24px;">
+              <p style="margin:0 0 12px;font-size:14px;font-weight:700;color:#92400e;">Complete your payment to confirm · Completa tu pago</p>
+              <a href="{{ payment_url }}" style="display:inline-block;padding:14px 40px;background:#D9AE5F;color:#071A2B;text-decoration:none;font-size:15px;font-weight:800;border-radius:10px;letter-spacing:0.5px;">💳 Complete Payment · Pagar</a>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+    {% endif %}
+
+    <!-- GUEST INFO -->
+    <tr>
+      <td style="padding:0 24px 20px;" class="ep">
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-radius:10px;overflow:hidden;border:1px solid #e2e8f0;">
+          <tr><td style="padding:11px 18px;background:#071A2B;"><p style="margin:0;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#D9AE5F;font-weight:700;">👤 Guest Information · Datos del Huésped</p></td></tr>
+          <tr>
+            <td style="padding:14px 18px 10px;">
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                <tr>
+                  <td width="50%" style="padding:0 12px 10px 0;vertical-align:top;" class="col">
+                    <p style="margin:0 0 2px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;">Name · Nombre</p>
+                    <p style="margin:0;font-size:14px;font-weight:600;color:#1e293b;">{{ customer_name }}</p>
+                  </td>
+                  <td width="50%" style="padding:0 0 10px;vertical-align:top;" class="col">
+                    <p style="margin:0 0 2px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;">Email</p>
+                    <p style="margin:0;font-size:14px;color:#1e293b;">{{ customer_email }}</p>
+                  </td>
+                </tr>
+                <tr>
+                  <td width="50%" style="padding:0 12px 10px 0;vertical-align:top;" class="col">
+                    <p style="margin:0 0 2px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;">Phone · Teléfono</p>
+                    <p style="margin:0;font-size:14px;color:#1e293b;">{{ customer_phone or '—' }}</p>
+                  </td>
+                  <td width="50%" style="padding:0 0 10px;vertical-align:top;" class="col">
+                    <p style="margin:0 0 2px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;">Passengers · Pasajeros</p>
+                    <p style="margin:0;font-size:14px;font-weight:600;color:#1e293b;">{{ passengers }}</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+
+    <!-- TRIP DETAILS (por piernas: LLEGADA / SALIDA) -->
+    <tr>
+      <td style="padding:0 24px 20px;" class="ep">
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-radius:10px;overflow:hidden;border:1px solid #e2e8f0;">
+          <tr><td style="padding:11px 18px;background:#071A2B;"><p style="margin:0;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#D9AE5F;font-weight:700;">🚗 Trip Details · Detalles del Viaje</p></td></tr>
+          <tr>
+            <td style="padding:14px 18px 4px;">
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                <tr>
+                  <td width="50%" style="padding:0 12px 12px 0;vertical-align:top;" class="col">
+                    <p style="margin:0 0 2px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;">Service · Tipo</p>
+                    <p style="margin:0;font-size:14px;font-weight:600;color:#1e293b;">{{ service_label }}</p>
+                  </td>
+                  <td width="50%" style="padding:0 0 12px;vertical-align:top;" class="col">
+                    <p style="margin:0 0 2px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;">Trip Type · Viaje</p>
+                    <p style="margin:0;font-size:14px;font-weight:600;color:#1e293b;">{{ trip_type_label or '—' }} · {{ passengers }} pax</p>
+                  </td>
+                </tr>
+              </table>
+              {% for leg in legs %}{% include 'leg_block.html' %}{% endfor %}
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+
+    <!-- PRICE -->
+    <tr>
+      <td style="padding:0 24px 20px;" class="ep">
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-radius:10px;overflow:hidden;border:1px solid #e2e8f0;">
+          <tr><td style="padding:11px 18px;background:#071A2B;"><p style="margin:0;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#D9AE5F;font-weight:700;">$ Amount Due · Total a Pagar</p></td></tr>
+          <tr>
+            <td style="padding:14px 18px;">
+              {% for item in items %}
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom:6px;">
+                <tr><td style="font-size:13px;color:#475569;padding:4px 0;">{{ item.label }}</td>
+                <td align="right" style="font-size:13px;font-weight:600;color:#0c4a6e;padding:4px 0;white-space:nowrap;">{{ item.price_text }}</td></tr>
+              </table>
+              {% endfor %}
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-top:2px solid #071A2B;margin-top:8px;">
+                <tr><td style="padding:10px 0 0;font-size:14px;font-weight:700;color:#071A2B;">Total Due · Total</td>
+                <td align="right" style="padding:10px 0 0;font-size:20px;font-weight:900;color:#071A2B;">{{ total_text }}</td></tr>
+              </table>
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-top:14px;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;">
+                <tr>
+                  <td style="padding:12px 16px;">
+                    <p style="margin:0 0 2px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;">Payment Method · Método de Pago</p>
+                    <p style="margin:0;font-size:14px;font-weight:600;color:#1e293b;">{{ payment_method_text }}</p>
+                  </td>
+                  <td align="right" style="padding:12px 16px;vertical-align:middle;">
+                    {% if show_stripe_icon %}<img src="{{ stripe_badge_url }}" alt="Stripe" width="96" height="24" style="display:block;height:24px;width:auto;max-width:120px;margin-left:auto;" />{% endif %}
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+
+    <!-- FOOTER -->
+    <tr>
+      <td style="padding:0;">
+        <div style="height:3px;background:linear-gradient(90deg,#D9AE5F,#f5d78a,#D9AE5F);"></div>
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+          <tr>
+            <td align="center" style="padding:18px 24px;background:#071A2B;">
+              <p style="margin:0 0 6px;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#D9AE5F;">Contact · Contacto</p>
+              <p style="margin:0 0 3px;">
+                <a href="tel:+526241222174" style="color:rgba(255,255,255,0.8);text-decoration:none;font-size:13px;">+52 624 122 2174</a>
+                &nbsp;·&nbsp;
+                <a href="https://wa.me/5216241222174" style="color:#4ade80;text-decoration:none;font-size:13px;font-weight:600;">WhatsApp</a>
+              </p>
+              <p style="margin:0 0 10px;"><a href="mailto:{{ contact_email }}" style="color:rgba(255,255,255,0.65);text-decoration:none;font-size:12px;">{{ contact_email }}</a></p>
+              <p style="margin:0;font-size:11px;color:rgba(255,255,255,0.35);">© {{ brand_name }}</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+
+  </table>
+</td></tr>
+</table>
+</body>
+</html>

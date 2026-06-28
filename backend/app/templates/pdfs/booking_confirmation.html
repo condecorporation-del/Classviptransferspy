@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>{% if show_prices %}Confirmación{% else %}Orden de Servicio{% endif %} — {{ confirmation_code }}</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 11px;
+      color: #1a1a2e;
+      background: #ffffff;
+      /* Padding bottom = altura del footer fijo */
+      padding-bottom: 72px;
+    }
+
+    /* ══ MARCA DE AGUA — centrada en la página ══ */
+    .watermark {
+      position: fixed;
+      top: 148.5mm;   /* mitad de A4: 297/2 */
+      left: 105mm;    /* mitad de A4: 210/2 */
+      width: 260px;
+      height: 260px;
+      margin-top: -130px;
+      margin-left: -130px;
+      opacity: 0.05;
+      z-index: 0;
+    }
+    .watermark img { width: 100%; height: 100%; object-fit: contain; }
+
+    /* ══ HEADER — navy full-width ══ */
+    .header {
+      background: #1a1a2e;
+      padding: 24px 40px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      z-index: 1;
+    }
+    .header-logo {
+      height: 60px;
+      width: auto;
+      object-fit: contain;
+      display: block;
+    }
+    .header-fallback {
+      font-size: 20px;
+      font-weight: 900;
+      color: #e8c170;
+      letter-spacing: 1px;
+    }
+    .header-right { text-align: right; }
+    .header-eyebrow {
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #6677aa;
+      margin-bottom: 5px;
+    }
+    .header-code {
+      font-size: 24px;
+      font-weight: 900;
+      color: #e8c170;
+      letter-spacing: 3px;
+      line-height: 1;
+    }
+    .doc-badge {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 4px 14px;
+      border-radius: 3px;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+    .doc-badge.confirm { background: #e8c170; color: #1a1a2e; }
+    .doc-badge.order   { border: 1px solid #e8c170; color: #e8c170; }
+
+    /* ── Franja dorada ── */
+    .gold-bar { background: #e8c170; height: 4px; position: relative; z-index: 1; }
+
+    /* ══ CUERPO ══ */
+    .body { padding: 28px 40px 10px; position: relative; z-index: 1; }
+
+    /* ── Panel cliente ── */
+    .client-panel {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0;
+      background: #f6f8fb;
+      border: 1px solid #dce3ec;
+      border-left: 5px solid #e8c170;
+      border-radius: 0 5px 5px 0;
+      padding: 16px 22px;
+      margin-bottom: 24px;
+    }
+    .cf {
+      min-width: 130px;
+      padding: 0 22px 0 0;
+      margin-bottom: 6px;
+    }
+    .fl {
+      display: block;
+      font-size: 7.5px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #9aaac0;
+      margin-bottom: 3px;
+    }
+    .fv { font-size: 12px; font-weight: 700; color: #1a1a2e; }
+    .fv.light { font-weight: 400; color: #444; }
+
+    /* ── Divisor sección ── */
+    .sec {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 22px 0 12px;
+    }
+    .sec-line { flex: 1; height: 1px; background: #dfc870; }
+    .sec-label {
+      font-size: 7.5px;
+      font-weight: 800;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: #a07820;
+    }
+
+    /* ── Leg de servicio ── */
+    .leg {
+      border: 1px solid #dce3ec;
+      border-radius: 5px;
+      overflow: hidden;
+      margin-bottom: 12px;
+      page-break-inside: avoid;
+    }
+    .leg-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 14px;
+    }
+    .leg.arrival .leg-head   { background: #eaf8f0; border-bottom: 1px solid #bce8d0; }
+    .leg.departure .leg-head { background: #fef1ec; border-bottom: 1px solid #f5cabb; }
+    .leg.service .leg-head   { background: #edf2f8; border-bottom: 1px solid #d0dae8; }
+
+    .leg-badge {
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .leg.arrival .leg-badge   { color: #156835; }
+    .leg.departure .leg-badge { color: #a02818; }
+    .leg.service .leg-badge   { color: #1e3a5e; }
+    .leg-date { font-size: 10px; font-weight: 600; color: #667788; }
+
+    .leg-time {
+      background: #1a1a2e;
+      padding: 10px 14px;
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      border-bottom: 1px solid #252540;
+    }
+    .lt-lbl { font-size: 8px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #7788aa; }
+    .lt-val { font-size: 26px; font-weight: 900; color: #e8c170; letter-spacing: 2px; line-height: 1; }
+
+    .leg-route {
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #fafbfc;
+      border-bottom: 1px solid #eef1f5;
+    }
+    .loc { flex: 1; font-size: 12px; font-weight: 700; color: #1a1a2e; }
+    .arr { color: #c8a030; font-size: 16px; font-weight: 900; flex-shrink: 0; }
+
+    .leg-meta {
+      display: flex;
+      background: #fff;
+    }
+    .lmc {
+      flex: 1;
+      padding: 7px 14px;
+      border-right: 1px solid #eef1f5;
+    }
+    .lmc:last-child { border-right: none; }
+
+    /* ── Notas ── */
+    .notes {
+      background: #fffdf4;
+      border: 1px solid #eed870;
+      border-left: 5px solid #e8c170;
+      border-radius: 0 4px 4px 0;
+      padding: 12px 16px;
+      margin-top: 16px;
+      page-break-inside: avoid;
+    }
+
+    /* ── Tabla precios ── */
+    .price-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 4px;
+    }
+    .price-table thead tr { background: #1a1a2e; }
+    .price-table thead th {
+      padding: 8px 14px;
+      text-align: left;
+      font-size: 8px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #e8c170;
+    }
+    .price-table thead th.r { text-align: right; }
+    .price-table tbody td {
+      padding: 9px 14px;
+      color: #222;
+      border-bottom: 1px solid #eef1f5;
+      font-size: 11px;
+    }
+    .price-table tbody td.r { text-align: right; font-weight: 700; }
+    .price-table tbody tr:last-child td { border-bottom: none; }
+
+    .total-row {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 0;
+    }
+    .total-box {
+      min-width: 200px;
+      padding: 12px 18px;
+      border: 1px solid #dce3ec;
+      border-top: 3px solid #1a1a2e;
+      text-align: right;
+    }
+    .t-misc { font-size: 10px; color: #777; margin-bottom: 3px; }
+    .t-label { font-size: 8px; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; color: #999; margin-bottom: 2px; }
+    .t-amount { font-size: 24px; font-weight: 900; color: #1a1a2e; }
+    .t-cur { font-size: 13px; color: #666; font-weight: 400; }
+
+    /* ══ FOOTER — fijo en la parte inferior de CADA página ══ */
+    .footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #1a1a2e;
+      padding: 12px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 2;
+    }
+    .footer-text {
+      color: #7788aa;
+      font-size: 9px;
+      line-height: 1.7;
+    }
+    .footer-logo {
+      height: 30px;
+      width: auto;
+      object-fit: contain;
+      opacity: 0.35;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- MARCA DE AGUA -->
+  {% if logo_data_uri %}
+  <div class="watermark"><img src="{{ logo_data_uri }}" alt=""/></div>
+  {% endif %}
+
+  <!-- HEADER -->
+  <div class="header">
+    {% if logo_data_uri %}
+      <img src="{{ logo_data_uri }}" alt="Class VIP Transfers" class="header-logo"/>
+    {% else %}
+      <span class="header-fallback">Class VIP Transfers</span>
+    {% endif %}
+    <div class="header-right">
+      <div class="header-eyebrow">Número de confirmación</div>
+      <div class="header-code">{{ confirmation_code or '—' }}</div>
+      {% if show_prices %}
+        <span class="doc-badge confirm">CONFIRMACIÓN DE RESERVA</span>
+      {% else %}
+        <span class="doc-badge order">ORDEN DE SERVICIO</span>
+      {% endif %}
+    </div>
+  </div>
+  <div class="gold-bar"></div>
+
+  <!-- CUERPO -->
+  <div class="body">
+
+    <!-- CLIENTE -->
+    <div class="client-panel">
+      <div class="cf">
+        <span class="fl">Cliente</span>
+        <span class="fv">{{ booking.customer_name or '—' }}</span>
+      </div>
+      {% if booking.customer_phone %}
+      <div class="cf">
+        <span class="fl">Teléfono</span>
+        <span class="fv light">{{ booking.customer_phone }}</span>
+      </div>
+      {% endif %}
+      {% if show_prices and booking.customer_email %}
+      <div class="cf">
+        <span class="fl">Email</span>
+        <span class="fv light">{{ booking.customer_email }}</span>
+      </div>
+      {% endif %}
+      <div class="cf">
+        <span class="fl">Fecha</span>
+        <span class="fv">{{ booking.booking_date }}</span>
+      </div>
+      <div class="cf">
+        <span class="fl">Pasajeros</span>
+        <span class="fv">{{ booking.passengers }} pax</span>
+      </div>
+      {% if booking.service_type %}
+      <div class="cf">
+        <span class="fl">Servicio</span>
+        <span class="fv light">{{ booking.service_type }}{% if booking.trip_type %} · {{ booking.trip_type }}{% endif %}</span>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- TIMELINE -->
+    {% if legs %}
+    <div class="sec">
+      <div class="sec-line"></div>
+      <div class="sec-label">Timeline de Servicio</div>
+      <div class="sec-line"></div>
+    </div>
+    {% for leg in legs %}
+    <div class="leg {{ leg.type }}">
+      <div class="leg-head">
+        <span class="leg-badge">
+          {% if leg.type == 'arrival' %}✈ &nbsp;LLEGADA
+          {% elif leg.type == 'departure' %}✈ &nbsp;SALIDA
+          {% else %}SERVICIO{% endif %}
+        </span>
+        {% if leg.service_date %}<span class="leg-date">{{ leg.service_date }}</span>{% endif %}
+      </div>
+      <div class="leg-time">
+        <span class="lt-lbl">{% if leg.type == 'departure' %}PICKUP{% else %}HORA DE SERVICIO{% endif %}</span>
+        <span class="lt-val">{{ leg.service_time or '—' }}</span>
+      </div>
+      <div class="leg-route">
+        <span class="loc">{{ leg.origin or '—' }}</span>
+        <span class="arr">→</span>
+        <span class="loc" style="text-align:right">{{ leg.destination or '—' }}</span>
+      </div>
+      {% if leg.flight or leg.airline or leg.flight_time %}
+      <div class="leg-meta">
+        {% if leg.flight %}<div class="lmc"><span class="fl">Vuelo</span><span class="fv" style="font-size:11px">{{ leg.flight }}</span></div>{% endif %}
+        {% if leg.airline %}<div class="lmc"><span class="fl">Aerolínea</span><span class="fv light" style="font-size:11px">{{ leg.airline }}</span></div>{% endif %}
+        {% if leg.flight_time %}<div class="lmc"><span class="fl">Hora de vuelo</span><span class="fv light" style="font-size:11px">{{ leg.flight_time }}</span></div>{% endif %}
+      </div>
+      {% endif %}
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <!-- NOTAS -->
+    {% if booking.notes %}
+    <div class="notes">
+      <span class="fl">Notas del cliente</span>
+      <div style="margin-top:5px; color:#333; font-size:11px; line-height:1.5;">{{ booking.notes }}</div>
+    </div>
+    {% endif %}
+
+    <!-- PRECIOS -->
+    {% if show_prices %}
+    <div class="sec" style="margin-top:26px;">
+      <div class="sec-line"></div>
+      <div class="sec-label">Desglose</div>
+      <div class="sec-line"></div>
+    </div>
+    {% if items %}
+    <table class="price-table">
+      <thead><tr>
+        <th>Concepto</th><th>Cant.</th><th>P. Unitario</th><th class="r">Total</th>
+      </tr></thead>
+      <tbody>
+        {% for it in items %}
+        <tr>
+          <td>{{ it.name }}</td>
+          <td>{{ it.quantity }}</td>
+          <td>${{ "%.2f"|format(it.unit_price) }} {{ currency }}</td>
+          <td class="r">${{ "%.2f"|format(it.total_price) }} {{ currency }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% endif %}
+    <div class="total-row">
+      <div class="total-box">
+        {% if discount %}<div class="t-misc">Descuento: -${{ "%.2f"|format(discount) }} {{ currency }}</div>{% endif %}
+        {% if tax %}<div class="t-misc">Impuestos: ${{ "%.2f"|format(tax) }} {{ currency }}</div>{% endif %}
+        <div class="t-label">TOTAL</div>
+        <div class="t-amount">${{ "%.2f"|format(total) }} <span class="t-cur">{{ currency }}</span></div>
+      </div>
+    </div>
+    {% endif %}
+
+  </div><!-- /body -->
+
+  <!-- FOOTER FIJO -->
+  <div class="footer">
+    <div class="footer-text">
+      Class VIP Transfers &nbsp;·&nbsp; Los Cabos, BCS, México<br>
+      +52 624 122 2174 &nbsp;·&nbsp; classviptransfers.com
+    </div>
+    {% if logo_data_uri %}
+      <img src="{{ logo_data_uri }}" alt="" class="footer-logo"/>
+    {% endif %}
+  </div>
+
+</body>
+</html>

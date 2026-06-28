@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+
+# Block admin and API routes from crawlers
+Disallow: /admin
+Disallow: /admin/
+Disallow: /api/
+Disallow: /confirmation
+Disallow: /checkout
+
+# Block non-canonical gallery redirect (now /portfolio)
+Disallow: /gallery
+
+Sitemap: https://classviptransfers.com/sitemap.xml

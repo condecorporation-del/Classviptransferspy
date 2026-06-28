@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="color-scheme" content="light">
+  <meta name="x-apple-disable-message-reformatting">
+  <title>New Booking · Nueva Reserva | {{ brand_name }}</title>
+  <style type="text/css">
+    @media only screen and (max-width: 620px) {
+      .ep  { padding-left: 16px !important; padding-right: 16px !important; }
+      .col { display: block !important; width: 100% !important; }
+    }
+  </style>
+</head>
+<body style="margin:0;padding:0;background-color:#f0f2f5;font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;font-size:14px;line-height:1.55;color:#1e293b;">
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background:#f0f2f5;">
+<tr><td align="center" style="padding:24px 12px 36px;">
+
+  <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="620" style="max-width:620px;width:100%;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 32px rgba(7,26,43,0.10);">
+
+    <!-- HEADER -->
+    <tr>
+      <td style="padding:0;">
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+          <tr>
+            <td style="padding:22px 28px;background-color:#071A2B;" class="ep">
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                <tr>
+                  <td style="vertical-align:middle;">
+                    {% if logo_url %}<img src="{{ logo_url }}" alt="{{ brand_name }}" height="52" style="height:52px;width:auto;display:block;max-width:180px;" />
+                    {% else %}<p style="margin:0;font-size:20px;font-weight:800;color:#fff;">{{ brand_name }}</p>{% endif %}
+                  </td>
+                  <td align="right" style="vertical-align:middle;">
+                    <p style="margin:0;font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:#D9AE5F;font-weight:700;">Internal Notification</p>
+                    <p style="margin:3px 0 0;font-size:11px;color:rgba(255,255,255,0.6);">Operaciones · Operations</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr><td style="height:3px;background:linear-gradient(90deg,#D9AE5F,#f5d78a,#D9AE5F);"></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <!-- STATUS -->
+    <tr>
+      <td align="center" style="padding:24px 28px 12px;" class="ep">
+        <p style="margin:0 0 6px;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#64748b;">New Booking · Nueva Reserva</p>
+        <p style="margin:0 0 8px;font-size:24px;font-weight:900;color:#071A2B;letter-spacing:2px;font-family:monospace;">{{ confirmation_code }}</p>
+        <span style="display:inline-block;background-color:#F59E0B;color:#ffffff;padding:6px 18px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;">{{ payment_method_text }}</span>
+      </td>
+    </tr>
+
+    <!-- CUSTOMER -->
+    <tr>
+      <td style="padding:14px 24px 20px;" class="ep">
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-radius:10px;overflow:hidden;border:1px solid #e2e8f0;">
+          <tr><td style="padding:11px 18px;background:#071A2B;"><p style="margin:0;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#D9AE5F;font-weight:700;">👤 Customer · Cliente</p></td></tr>
+          <tr>
+            <td style="padding:14px 18px 10px;">
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                <tr>
+                  <td width="50%" style="padding:0 12px 10px 0;vertical-align:top;" class="col">
+                    <p style="margin:0 0 2px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;">Name · Nombre</p>
+                    <p style="margin:0;font-size:14px;font-weight:600;color:#1e293b;">{{ customer_name }}</p>
+                  </td>
+                  <td width="50%" style="padding:0 0 10px;vertical-align:top;" class="col">
+                    <p style="margin:0 0 2px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;">Passengers · Pasajeros</p>
+                    <p style="margin:0;font-size:14px;font-weight:600;color:#1e293b;">{{ passengers }}</p>
+                  </td>
+                </tr>
+                <tr>
+                  <td width="50%" style="padding:0 12px 10px 0;vertical-align:top;" class="col">
+                    <p style="margin:0 0 2px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;">Email</p>
+                    <p style="margin:0;font-size:14px;color:#1e293b;"><a href="mailto:{{ customer_email }}" style="color:#0c4a6e;text-decoration:none;">{{ customer_email }}</a></p>
+                  </td>
+                  <td width="50%" style="padding:0 0 10px;vertical-align:top;" class="col">
+                    <p style="margin:0 0 2px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;">Phone · Teléfono</p>
+                    <p style="margin:0;font-size:14px;color:#1e293b;">{{ customer_phone or '—' }}</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+
+    <!-- TRIP / OPERATION -->
+    <tr>
+      <td style="padding:0 24px 20px;" class="ep">
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-radius:10px;overflow:hidden;border:1px solid #e2e8f0;">
+          <tr><td style="padding:11px 18px;background:#071A2B;"><p style="margin:0;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#D9AE5F;font-weight:700;">🚗 Trip Details · Operación</p></td></tr>
+          <tr>
+            <td style="padding:14px 18px 4px;">
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                <tr>
+                  <td width="50%" style="padding:0 12px 12px 0;vertical-align:top;" class="col">
+                    <p style="margin:0 0 2px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;">Service · Tipo</p>
+                    <p style="margin:0;font-size:14px;font-weight:600;color:#1e293b;">{{ service_label }}</p>
+                  </td>
+                  <td width="50%" style="padding:0 0 12px;vertical-align:top;" class="col">
+                    <p style="margin:0 0 2px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;">Trip Type · Viaje</p>
+                    <p style="margin:0;font-size:14px;font-weight:600;color:#1e293b;">{{ trip_type_label or '—' }} · {{ passengers }} pax</p>
+                  </td>
+                </tr>
+              </table>
+              {% for leg in legs %}{% include 'leg_block.html' %}{% endfor %}
+              {% if notes %}
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                <tr><td style="padding:2px 0 10px;">
+                  <p style="margin:0 0 2px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;">Notes · Notas</p>
+                  <p style="margin:0;font-size:14px;color:#1e293b;">{{ notes }}</p>
+                </td></tr>
+              </table>
+              {% endif %}
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+
+    <!-- REVENUE -->
+    <tr>
+      <td style="padding:0 24px 24px;" class="ep">
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-radius:10px;overflow:hidden;border:1px solid #e2e8f0;">
+          <tr><td style="padding:11px 18px;background:#071A2B;"><p style="margin:0;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#D9AE5F;font-weight:700;">$ Revenue · Precio</p></td></tr>
+          <tr>
+            <td style="padding:14px 18px;">
+              {% for item in items %}
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom:6px;">
+                <tr><td style="font-size:13px;color:#475569;padding:4px 0;">{{ item.label }}</td>
+                <td align="right" style="font-size:13px;font-weight:600;color:#0c4a6e;padding:4px 0;white-space:nowrap;">{{ item.price_text }}</td></tr>
+              </table>
+              {% endfor %}
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-top:2px solid #071A2B;margin-top:8px;">
+                <tr><td style="padding:10px 0 0;font-size:14px;font-weight:700;color:#071A2B;">Total</td>
+                <td align="right" style="padding:10px 0 0;font-size:20px;font-weight:900;color:#071A2B;">{{ total_text }}</td></tr>
+              </table>
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-top:14px;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;">
+                <tr>
+                  <td style="padding:12px 16px;">
+                    <p style="margin:0 0 2px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;">Payment · Pago</p>
+                    <p style="margin:0;font-size:14px;font-weight:600;color:#1e293b;">{{ payment_method_text }}</p>
+                  </td>
+                  <td align="right" style="padding:12px 16px;vertical-align:middle;">
+                    {% if show_stripe_icon %}<img src="{{ stripe_badge_url }}" alt="Stripe" width="96" height="24" style="display:block;height:24px;width:auto;max-width:120px;margin-left:auto;" />{% endif %}
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+
+    <!-- FOOTER -->
+    <tr>
+      <td style="padding:0;">
+        <div style="height:3px;background:linear-gradient(90deg,#D9AE5F,#f5d78a,#D9AE5F);"></div>
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+          <tr>
+            <td align="center" style="padding:16px 24px;background:#071A2B;">
+              <p style="margin:0;font-size:10px;color:rgba(255,255,255,0.45);">Internal · {{ brand_name }} — Emitido {{ issue_date }}</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+
+  </table>
+</td></tr>
+</table>
+</body>
+</html>
