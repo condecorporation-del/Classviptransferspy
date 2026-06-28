@@ -1244,6 +1244,32 @@ reiniciado con el código nuevo (health 200, login 200, `/pricing/rules` 404). S
 (no analiza) y los `references/*.md` son plantillas placeholder. La revisión/calificación (B+ → mejorada
 con esta fase) se hizo con herramientas reales (ruff/pytest/tsc), no con ese skill.
 
+## Fase 31p — Email de confirmación tras el pago (no dependía del webhook) (28 jun 2026)
+
+**Síntoma (Marlon):** al terminar la reserva solo llega el correo de "Pago Pendiente";
+NUNCA llega la confirmación (el más importante) ni el aviso a la compañía.
+
+**Causa raíz (confirmación):** `send_booking_confirmation` SOLO se disparaba desde el webhook de
+Stripe (`payment_intent.succeeded`). El fast-path `confirm-payment` —que el frontend SIEMPRE llama
+tras `confirmCardPayment`— marcaba el pago como completado pero no enviaba la confirmación. Si el
+webhook no está configurado en producción (endpoint + `STRIPE_WEBHOOK_SECRET` en el dashboard de
+Stripe), la confirmación nunca salía.
+
+**Fix (`stripe.py` confirm-payment):** tras `mark_completed`, si fue ESTE request el que completó el
+pago (`just_paid`), envía `send_booking_confirmation` (cliente) + `send_company_notification`
+(operaciones). Idempotente con el webhook: el que gane la carrera manda los correos una sola vez.
+Best-effort (un fallo de email no rompe la confirmación del pago). Logger de módulo agregado.
+
+**Diagnóstico del correo de compañía:** los 3 templates (pending/confirmed/company) renderizan OK en
+prueba local — NO es bug de código. El de pago pendiente (mismo Resend, mismo `from`) sí llega al
+cliente, así que el envío FROM `bookings@classviptransfers.com` funciona. Que el de compañía a
+`armando@classviptransfers.com` no llegue apunta a ENTREGA de Resend (dominio/destinatario/spam) o a
+que el buzón de armando@ aún no recibe (MX en configuración). Acción de Marlon: revisar el dashboard
+de Resend → Logs (estado Delivered/Bounced) y confirmar que armando@ recibe correo externo.
+Pendiente opcional: registrar envíos en la tabla EmailLog para visibilidad en el admin.
+
+---
+
 ## Fase 31o — Fix checkout (Stripe) + verificación end-to-end del flujo de reservas (28 jun 2026)
 
 **Pedido de Marlon:** "verifica que el flujo de reservas funciona perfectamente, se guarda
