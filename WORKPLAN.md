@@ -137,7 +137,7 @@ ruta en build). Opciones, en orden de menor a mayor fricción:
 - [ ] Confirmar que el dominio viejo/histórico (si lo había) hace 301 al nuevo, para no perder
       la autoridad que ya tenía ("antes salía primera").
 
-**FASE SEO-1 — On-page técnico (código, sin tocar UX)** — 🟡 EN CURSO (28 jun 2026, commit 3329873)
+**FASE SEO-1 — On-page técnico (código, sin tocar UX)** — ✅ COMPLETA (28 jun 2026, commits 3329873, a5a7f1f, 7a69f5c, 015c954)
 - [x] **Canonical/JSON-LD consistentes a `www`**: 9 referencias apuntaban a `classviptransfers.com`
       sin www (Activities/Transfers/Portfolio/Contact/Book) → dividían autoridad. Todas a www.
 - [x] Title + meta description con keyword local: Transfers ("...en Los Cabos · SJD Airport"),
@@ -145,13 +145,24 @@ ruta en build). Opciones, en orden de menor a mayor fricción:
       Home/Activities ya estaban bien. (description de Transfers reforzada con "SJD to any hotel").
 - [x] `<html lang>` dinámico según idioma activo (estaba fijo en `es`; el sitio arranca en inglés).
       `og:locale`/`og:locale:alternate` también dinámicos. Vía Helmet en `SEO.tsx`.
-- [ ] Schema adicional: `BreadcrumbList`, `Organization` con `logo`/`sameAs`. (`Service` ya existe en
-      Transfers/Book; `LocalBusiness`+`FAQPage`+`AggregateRating` ya en Home.)
-- [ ] `hreflang` es-MX / en-US (requiere URLs distinguibles por idioma — hoy el idioma es client-side
-      con localStorage, no por URL; evaluar en FASE SEO-2 con prerender).
-- [ ] Alt text descriptivo con keywords en TODAS las imágenes (hero, flota, hoteles).
-- [ ] Imágenes en formato moderno (Cloudinary ya puede servir `f_auto,q_auto` → WebP/AVIF).
-- [ ] Verificar Core Web Vitals reales con PageSpeed Insights (LCP < 2.5s, CLS < 0.1, INP < 200ms).
+- [x] Schema `Organization` (logo + sameAs + contactPoint) en Home, y `BreadcrumbList` en
+      Transfers/Activities/Contact/Book/Portfolio. (`Service` ya existía en Transfers/Book;
+      `LocalBusiness`+`FAQPage`+`AggregateRating` ya en Home.)
+- [x] Imágenes hero en formato moderno: transform `q_auto:good,f_auto` (WebP/AVIF) en
+      `cloudinary-assets.ts` (antes JPG crudo) + `preload` de la hero LCP en `index.html`. Alt text
+      del hero de Home reforzado con keywords. (Collages decorativos quedan con `alt=""`, correcto.)
+- [~] `hreflang` es-MX / en-US: DIFERIDO. Requiere URLs distinguibles por idioma; hoy el idioma es
+      client-side (localStorage), no por URL. Se evalúa en FASE SEO-2 (prerender) o con i18n por ruta.
+- [ ] Core Web Vitals: medir con PageSpeed Insights tras el deploy (ya se optimizó LCP con hero
+      WebP+preload, fuentes async y bundle splitting). **Acción de Marlon:** correr PageSpeed.
+
+> **NOTA — por qué NO se hizo FASE SEO-2/3 de forma autónoma (sesión nocturna del 28 jun):** Marlon
+> pidió "termina todo el SEO mientras duermo". Se completó TODO el on-page seguro (SEO-1). NO se hizo:
+> - **FASE SEO-2 (prerender):** cambia el `build` y podría tumbar el sitio en producción con clientes
+>   reales. Es exactamente el tipo de cambio que la regla dura de Marlon ("nada de SEO debe afectar el
+>   funcionamiento") exige verificar despierto. Queda lista para ejecutar CON su OK y supervisión.
+> - **FASE SEO-3 (landing pages por hotel):** necesita decisiones de contenido/datos (qué hoteles,
+>   slugs, textos) — no es trabajo autónomo. Plan propio cuando Marlon lo arranque.
 
 **FASE SEO-2 — Prerender estático (la decisión grande de arriba)**
 - [ ] Integrar prerender de rutas públicas conocidas (Home, Transfers, Activities, Portfolio,
