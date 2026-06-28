@@ -360,8 +360,13 @@ const Book = () => {
       if (data.specialNote.trim()) notesParts.push(`Note: ${data.specialNote.trim()}`);
       if (notesParts.length > 0) bookingPayload.notes = notesParts.join(' | ');
 
-      // Create booking
-      const apiUrl = `${getApiBaseUrl()}/api/v1/bookings`;
+      // Create booking. OJO: el endpoint es `POST /api/v1/bookings/` CON slash
+      // final (la ruta del backend es @router.post("/")). Si se pega sin slash,
+      // FastAPI responde 307 redirect al slash; en producción ese redirect
+      // cross-origin de un POST con preflight CORS rompe en el navegador
+      // (en dev no, porque el proxy de Vite lo absorbe). Con el slash exacto
+      // no hay redirect.
+      const apiUrl = `${getApiBaseUrl()}/api/v1/bookings/`;
       
       const response = await fetch(apiUrl, {
         method: 'POST',
