@@ -84,7 +84,7 @@ const activitiesLd = {
   '@type': 'TouristAttraction',
   name: 'Class VIP Transfers — Adventure Activities Los Cabos',
   description: 'ATV rides, camel safaris, horseback riding, Sky Bikes (Guinness World Record), and RZR off-road adventures in Los Cabos, Mexico. Round-trip transportation included.',
-  url: 'https://classviptransfers.com/activities',
+  url: 'https://www.classviptransfers.com/activities',
   touristType: ['Adventure', 'Family', 'Outdoor'],
   photo: cloudinaryAssets.activities.atv,
   address: {
@@ -130,7 +130,7 @@ const Activities = () => {
         title="Adventure Activities & Tours in Los Cabos"
         description="Book ATV, camel safari, horseback riding, Sky Bikes (Guinness Record) & RZR in Los Cabos. Combo deals from $100/person. Round-trip transport included."
         keywords="ATV tour los cabos, cabo activities, UTV cabo san lucas, horseback riding cabo, camel safari los cabos, sky bikes cabo, cabo adventure tours, things to do cabo san lucas, cactus tours los cabos"
-        canonical="https://classviptransfers.com/activities"
+        canonical="https://www.classviptransfers.com/activities"
         jsonLd={activitiesLd}
       />
 

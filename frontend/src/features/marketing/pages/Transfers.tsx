@@ -116,10 +116,10 @@ const Transfers = () => {
   return (
     <>
       <SEO
-        title="Private Airport Transfers"
-        description="Private airport transportation in Los Cabos with premium Transit comfort, flight tracking, bilingual drivers, and door-to-door service."
+        title="Private Airport Transfers in Los Cabos · SJD Airport"
+        description="Private airport transportation in Los Cabos with premium Transit comfort, flight tracking, bilingual drivers, and door-to-door service from SJD Airport to any hotel."
         keywords="SJD airport transfer, Los Cabos private transfer, Cabo airport transportation, private airport ride, VIP transit Los Cabos, Los Cabos chauffeur"
-        canonical="https://classviptransfers.com/transfers"
+        canonical="https://www.classviptransfers.com/transfers"
         jsonLd={serviceLd}
       />
 

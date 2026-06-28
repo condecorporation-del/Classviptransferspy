@@ -12,7 +12,7 @@ const contactLd = {
   '@type': 'LocalBusiness',
   name: 'Class VIP Transfers',
   description: 'Private luxury airport transfers and adventure activities in Los Cabos, Mexico. 30+ years of service.',
-  url: 'https://classviptransfers.com',
+  url: 'https://www.classviptransfers.com',
   telephone: '+526241222174',
   email: 'Armando@classviptransfers.com',
   address: {
@@ -76,10 +76,10 @@ const Contact = () => {
   return (
     <div>
       <SEO
-        title="Contact Us"
+        title="Contact Class VIP Transfers · Los Cabos 24/7"
         description="Contact Class VIP Transfers in Los Cabos. WhatsApp, iMessage or email. Available 24/7 for airport transfers and activity bookings."
         keywords="contact class vip transfers, los cabos transfer contact, cabo whatsapp transfer, cabo airport contact"
-        canonical="https://classviptransfers.com/contact"
+        canonical="https://www.classviptransfers.com/contact"
         jsonLd={contactLd}
       />
       {/* Hero - dark */}

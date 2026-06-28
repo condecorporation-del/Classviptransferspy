@@ -253,19 +253,19 @@ const Portfolio = () => {
   return (
     <>
       <SEO
-        title={isEs ? 'Portafolio - Paquetes, Rentas y Propiedades en Venta' : 'Portfolio - Packages, Rentals, and Properties for Sale'}
+        title={isEs ? 'Portafolio Los Cabos - Paquetes, Villas y Propiedades' : 'Los Cabos Portfolio - Packages, Villas & Properties'}
         description={
           isEs
             ? 'Paquetes personalizados con villa, transportacion y actividades incluidas, propiedades en renta y propiedades en venta en Los Cabos.'
             : 'Custom all-inclusive packages with villa, transportation, and activities, plus rental properties and homes for sale in Los Cabos.'
         }
-        canonical="https://classviptransfers.com/portfolio"
+        canonical="https://www.classviptransfers.com/portfolio"
         jsonLd={{
           '@context': 'https://schema.org',
           '@type': 'CollectionPage',
           name: 'Class VIP Portfolio',
           description: 'Custom villa packages, rental properties, and properties for sale in Los Cabos.',
-          url: 'https://classviptransfers.com/portfolio',
+          url: 'https://www.classviptransfers.com/portfolio',
         }}
       />
 

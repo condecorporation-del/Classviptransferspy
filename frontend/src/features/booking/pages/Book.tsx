@@ -1737,15 +1737,15 @@ const Book = () => {
   return (
     <div className="pt-28 pb-36 lg:pb-24 px-4 min-h-screen bg-gradient-to-b from-background to-muted/30">
       <SEO
-        title="Book Your Transfer"
+        title="Book a Private Airport Transfer in Los Cabos"
         description="Book your private luxury airport transfer in Los Cabos in minutes. Choose your vehicle, route, date, and extras. Secure payment via Stripe."
         keywords="book cabo transfer, reserve los cabos transportation, cabo airport pickup, private driver reservation los cabos"
-        canonical="https://classviptransfers.com/book"
+        canonical="https://www.classviptransfers.com/book"
         jsonLd={{
           '@context': 'https://schema.org',
           '@type': 'Service',
           name: 'Book a Private Airport Transfer — Los Cabos',
-          provider: { '@type': 'LocalBusiness', name: 'Class VIP Transfers', url: 'https://classviptransfers.com' },
+          provider: { '@type': 'LocalBusiness', name: 'Class VIP Transfers', url: 'https://www.classviptransfers.com' },
           areaServed: { '@type': 'Place', name: 'Los Cabos, Baja California Sur, Mexico' },
           description: 'Book a private luxury transfer from SJD Airport to your hotel in Los Cabos.',
           offers: { '@type': 'Offer', priceCurrency: 'USD', price: '90', priceValidUntil: '2027-12-31' },
