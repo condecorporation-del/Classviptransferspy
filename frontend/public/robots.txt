@@ -11,4 +11,4 @@ Disallow: /checkout
 # Block non-canonical gallery redirect (now /portfolio)
 Disallow: /gallery
 
-Sitemap: https://classviptransfers.com/sitemap.xml
+Sitemap: https://www.classviptransfers.com/sitemap.xml

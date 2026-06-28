@@ -13,7 +13,7 @@ type SEOProps = {
 
 const getBaseUrl = () => {
   if (typeof window !== 'undefined') return window.location.origin;
-  return 'https://classviptransfers.com';
+  return 'https://www.classviptransfers.com';
 };
 
 export const SEO = ({ title, description, keywords, image, url, jsonLd, canonical }: SEOProps) => {

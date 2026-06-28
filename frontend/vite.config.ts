@@ -13,7 +13,17 @@ export default defineConfig({
     transformer: 'postcss',
   },
   build: {
-    cssMinify: false,
+    cssMinify: 'esbuild',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-query': ['@tanstack/react-query'],
+          'vendor-motion': ['framer-motion'],
+          'vendor-charts': ['recharts'],
+        },
+      },
+    },
   },
   server: {
     proxy: {

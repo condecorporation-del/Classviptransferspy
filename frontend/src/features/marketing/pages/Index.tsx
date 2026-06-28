@@ -68,7 +68,7 @@ const Index = () => {
     '@type': 'LocalBusiness',
     name: 'Class VIP Transfers',
     description: 'Premium private airport transportation in Los Cabos with 30+ years of experience. Serving 250+ hotels from SJD Airport. TripAdvisor Certificate of Excellence.',
-    url: 'https://classviptransfers.com',
+    url: 'https://www.classviptransfers.com',
     telephone: '+526241222174',
     email: 'Armando@classviptransfers.com',
     address: { '@type': 'PostalAddress', addressLocality: 'Los Cabos', addressRegion: 'Baja California Sur', addressCountry: 'MX' },
@@ -105,7 +105,7 @@ const Index = () => {
         title="Los Cabos Airport Transfer | Luxury Transportation - 30 Years Experience"
         description="Premium private transportation from Los Cabos Airport (SJD) to any hotel. 30 years of experience. TripAdvisor Certificate of Excellence. Book direct - best rates guaranteed."
         keywords="cabo airport transfer, sjd airport transportation, cabo san lucas transfer, private transportation los cabos, Class VIP Transfers, luxury transfer cabo, cabo adventure tours"
-        canonical="https://classviptransfers.com/"
+        canonical="https://www.classviptransfers.com/"
         jsonLd={[localBusinessLd, faqLd]}
       />
       {/* ===== HERO (dark cinematic) ===== */}
