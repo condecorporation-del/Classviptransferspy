@@ -1244,6 +1244,42 @@ reiniciado con el código nuevo (health 200, login 200, `/pricing/rules` 404). S
 (no analiza) y los `references/*.md` son plantillas placeholder. La revisión/calificación (B+ → mejorada
 con esta fase) se hizo con herramientas reales (ruff/pytest/tsc), no con ese skill.
 
+## Fase 31o — Fix checkout (Stripe) + verificación end-to-end del flujo de reservas (28 jun 2026)
+
+**Pedido de Marlon:** "verifica que el flujo de reservas funciona perfectamente, se guarda
+en la base de datos, y también las reservaciones del admin. Es de suma importancia."
+
+**Bug encontrado y corregido (el 400 que veía el usuario al reservar):**
+El error NO estaba en crear la reserva (esa daba 201 y se guardaba bien). Estaba en el paso
+siguiente, el checkout. Diagnosticado mandando reservas reales a la API de producción:
+- `POST /api/v1/stripe/create-payment-intent` devolvía `400 {"detail":"booking_id es requerido"}`.
+- Causa 1 (request): el frontend manda `bookingId` (camelCase) pero ese endpoint solo leía
+  `booking_id` (snake). Su hermano `confirm-payment` en el MISMO archivo ya aceptaba ambos.
+  Fix (`stripe.py`): `booking_id = body.get("bookingId") or body.get("booking_id")` — consistente
+  con el hermano, sin duplicar lógica.
+- Causa 2 (response): el frontend leía `intentData.data.clientSecret` pero el backend devuelve
+  `client_secret` DIRECTO (sin envoltorio `.data`). Mismo bug heredado del backend TS viejo que ya
+  se corrigió en `Book.tsx`. Fix (`Checkout.tsx`): leer `intentData.client_secret`.
+- Antes, en la misma sesión: `Book.tsx` leía `result.data?.id` (→ "No booking ID returned") y
+  pegaba a `/api/v1/bookings` sin slash final (→ 307 redirect que rompía cross-origin en prod;
+  en dev no, por el proxy de Vite). Ambos corregidos.
+
+**Verificación end-to-end contra PRODUCCIÓN (14/14 pruebas verdes):**
+Script `/tmp/verify_bookings.sh` ejecutado contra la API real:
+1. Flujo público: `POST /bookings/` → 201; precio recalculado server-side (11000); status DRAFT;
+   `GET /bookings/{id}` recupera la MISMA reserva (persistida en DB); cliente e items persistidos.
+2. Checkout: `create-payment-intent` con `bookingId` → 200 con `client_secret` real
+   (`pi_3TnFWK...`) → claves de Stripe en Railway válidas y funcionando.
+3. Admin: login 200; la reserva pública aparece en `GET /admin/bookings` (búsqueda por código);
+   `POST /admin/bookings` (reserva manual, payment_method=none) → 201, status OFFLINE_HOLD, total
+   9000; persistida y visible en el panel.
+
+**Conclusión:** flujo de reservas público + admin verificado funcionando y persistiendo en la DB.
+**Nota:** quedaron ~9 reservas de prueba en producción (clientes "Test Guest", "VERIFY ..."). No hay
+endpoint de hard-delete (solo cancel); pendiente decidir con Marlon cómo limpiarlas.
+
+---
+
 ## Fase 31n — Deploy en vivo + notificación a operaciones + base SEO/performance (28 jun 2026)
 
 **Contexto:** Marlon ejecutó el deploy real. Esta fase cubre los fixes que surgieron al levantar
