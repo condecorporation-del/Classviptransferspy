@@ -1275,8 +1275,18 @@ Script `/tmp/verify_bookings.sh` ejecutado contra la API real:
    9000; persistida y visible en el panel.
 
 **Conclusión:** flujo de reservas público + admin verificado funcionando y persistiendo en la DB.
-**Nota:** quedaron ~9 reservas de prueba en producción (clientes "Test Guest", "VERIFY ..."). No hay
-endpoint de hard-delete (solo cancel); pendiente decidir con Marlon cómo limpiarlas.
+
+**Botón "Borrar" reserva (hard delete) + limpieza de las pruebas:**
+Marlon pidió un botón permanente para borrar reservas (no solo limpiar las de prueba).
+- Backend: `DELETE /api/v1/admin/bookings/{id}` (auth + audit). `BookingService.delete()` hace
+  hard delete; los hijos caen por las reglas ondelete de las FK: items/payments/pricing_overrides/
+  assignments/email_logs → CASCADE; account_charges + ai_conversations → SET NULL (se conservan).
+  El audit log sobrevive (`entity_id` es String, no FK).
+- Frontend (`AdminBookings.tsx`): botón "Borrar" rojo en el detalle, con doble confirmación que
+  muestra el código; tras borrar cierra el detalle (no refresca, daría 404) y refresca la lista.
+  Distinto de "Cancel" (que solo cambia el status). Helper `doDelete` + prop `onClose`.
+- Verificado en producción: las 9 reservas de prueba ("Test Guest"/"VERIFY ...") borradas vía el
+  endpoint nuevo, 0 restantes. El panel quedó limpio.
 
 ---
 
