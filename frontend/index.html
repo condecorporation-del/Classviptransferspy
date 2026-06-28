@@ -22,6 +22,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
 
+    <!-- Preload de la primera imagen del hero (elemento LCP de la home): el
+         navegador la empieza a bajar antes de cargar React. Mismo URL/transform
+         que cloudinary-assets.ts (q_auto:good,f_auto → WebP/AVIF). -->
+    <link rel="preload" as="image" fetchpriority="high"
+      href="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto:good,f_auto/v1774175174/classvip/hero-1.jpg" />
+
     <!--
       Google Fonts cargadas de forma NO bloqueante:
       1. rel="preload" as="style" → el browser descarga en paralelo sin bloquear render
