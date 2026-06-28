@@ -1137,6 +1137,36 @@ reiniciado con el código nuevo (health 200, login 200, `/pricing/rules` 404). S
 (no analiza) y los `references/*.md` son plantillas placeholder. La revisión/calificación (B+ → mejorada
 con esta fase) se hizo con herramientas reales (ruff/pytest/tsc), no con ese skill.
 
+## Fase 31m — Preparación de deploy (Railway + Vercel + Supabase) + seguridad (27 jun 2026)
+
+**Pedido de Marlon:** "deja todo listo para el deploy, que la base de datos funcione bien y sobre todo cosas de seguridad. Railway $5/mes."
+
+**🔴 Fuga de seguridad encontrada y remediada:**
+- `backend/-X` era un archivo de cookies de curl (`curl -c -X`) con un **JWT admin real**. Se había subido en el commit inicial a GitHub.
+- Remediación: `git rm`, se reescribió el commit inicial (`--amend`), `force-with-lease` push, `reflog expire` + `gc --prune=now`. Verificado: 0 rastros de la firma del token en todo el historial (local y `origin/main`).
+- `.gitignore` y `backend/.dockerignore`: agregados patrones `-X`, `*.cookie`, `cookies*.txt`.
+- ⚠️ Pendiente del usuario: **rotar `SECRET_KEY` en producción** (invalida el token filtrado; además ya estaba expirado).
+
+**Endurecimiento de seguridad:**
+- `main.py`: `/docs`, `/redoc`, `/openapi.json` → `None` en producción (no exponer el esquema de la API). En dev siguen activos.
+
+**Archivos de deploy creados:**
+- `backend/Dockerfile` — `python:3.12-slim` + libs de sistema de WeasyPrint (libpango, libcairo, libgdk-pixbuf, fonts-dejavu). Usuario no-root (uid 10001). `pip install .` resuelve `[project.dependencies]`.
+- `backend/start.sh` — `alembic upgrade head` y luego `uvicorn` con `--proxy-headers --forwarded-allow-ips='*'` (rate limiter por IP correcto detrás del proxy de Railway). Workers vía `WEB_CONCURRENCY` (default 2).
+- `backend/railway.toml` — builder dockerfile, healthcheck `/health`, restart on_failure. Requiere Root Directory = `backend` en Railway.
+- `backend/.dockerignore` — excluye .venv, caches, .env, tests del contexto de build.
+- `frontend/vercel.json` — framework vite, SPA rewrites (todas las rutas → index.html, evita 404 al refrescar /admin), cabeceras de seguridad, cache de assets.
+- `DEPLOY.md` (raíz) — guía completa paso a paso con tabla de variables de entorno.
+
+**Punto crítico documentado (Supabase + Railway):**
+- La "Direct connection" de Supabase es solo IPv6; Railway no garantiza salida IPv6 → las migraciones fallarían. Solución documentada: usar el **Session pooler (5432, IPv4)** para `DATABASE_URL` y dejar `DATABASE_URL_DIRECT` vacía. `database.py` no se modificó (auto-detecta).
+- `VITE_API_URL` va SIN `/api/v1` (el código ya antepone ese prefijo en cada fetch).
+- Railway y Supabase en la **misma región US East (Virginia)** para latencia mínima backend↔DB.
+
+**Verificado:** 114 tests backend verdes con el cambio de docs; `main.py` importa OK. Push limpio a `origin/main` (commit 5b79fb8).
+
+---
+
 ## Fase 31k — FinanzasTab: textos legibles en dark mode + botón imprimir (27 jun 2026)
 
 **Pedido de Marlon:** textos negros no se ven en fondo oscuro, y el botón imprimir no hacía nada.
