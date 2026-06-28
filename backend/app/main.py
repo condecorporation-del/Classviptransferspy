@@ -112,6 +112,26 @@ async def integrity_error_handler(request: Request, exc: IntegrityError):
     )
 
 
+# ─── Preflight CORS catch-all ─────────────────────────────────────────────────
+# Manejador explícito para TODOS los OPTIONS. Garantiza que los preflights
+# cross-origin siempre reciban los headers correctos, independientemente
+# de cómo se ordenen los middlewares.
+@app.options("/{path:path}")
+async def _cors_preflight(request: Request, path: str) -> Response:
+    origin = request.headers.get("origin", "")
+    allow_origin = origin if origin in origins else ""
+    return Response(
+        status_code=200,
+        headers={
+            "Access-Control-Allow-Origin": allow_origin,
+            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type, Authorization, Cookie, X-Requested-With",
+            "Access-Control-Allow-Credentials": "true",
+            "Access-Control-Max-Age": "86400",
+        },
+    )
+
+
 # ─── API v1 ───────────────────────────────────────────────────────────────────
 app.include_router(api_router, prefix="/api/v1")
 
