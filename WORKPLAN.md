@@ -1260,6 +1260,41 @@ reiniciado con el código nuevo (health 200, login 200, `/pricing/rules` 404). S
 (no analiza) y los `references/*.md` son plantillas placeholder. La revisión/calificación (B+ → mejorada
 con esta fase) se hizo con herramientas reales (ruff/pytest/tsc), no con ese skill.
 
+## Fase 31q — IVA 16% en reservas, checkout, confirmaciones y correos (28 jun 2026)
+
+**Pedido de Marlon:** agregar 16% de IVA, que se vea en la confirmación y que al pagar diga
+"16% de IVA automáticamente".
+
+**Diseño:** el IVA se calcula UNA sola vez en el backend (fuente de verdad) y fluye a Stripe,
+correos, PDF y todas las pantallas. El IVA se SUMA sobre el subtotal (no va incluido).
+
+**Backend:**
+- `config.py`: `tax_rate = 0.16` (configurable).
+- `services/booking.py`: helper `_split_tax(subtotal)` → `(tax, total)`. Aplicado en `create_draft`
+  Y `create_manual`: `subtotal_amount` = suma de items, `tax_amount` = 16%, `total_amount` = subtotal+tax.
+  Stripe ya cobra `total_amount`, así que cobra el IVA automáticamente (verificado: $110 → $127.60).
+- `services/email.py`: agregado `tax_rate_pct` al contexto. `customer_confirmed.html` YA tenía el
+  desglose (subtotal/IVA/total); se agregó a `customer_pending.html` (el que reciben al ir a pagar) y
+  a `company_notification.html`. Etiqueta unificada "IVA (16%) · Tax".
+- `services/pdf.py` + `booking_confirmation.html` (PDF): muestra Subtotal + IVA (16%) + Total.
+
+**Frontend:**
+- `booking-api.ts`: mapea `subtotal_amount` y `tax_amount` (antes solo total).
+- `Checkout.tsx`, `Confirmation.tsx`: muestran Subtotal + IVA + Total; el % se DERIVA de los montos
+  reales del backend (no hardcodeado).
+- `Book.tsx`: el resumen previo (estimación client-side) ahora muestra Subtotal + IVA (16%) + Total
+  con `grandTotal = total * 1.16`, para que el precio del formulario coincida con el del checkout y
+  no haya salto sorpresa al pagar.
+
+**Tests:** 10 tests (pricing/pagos/cuentas) actualizados para esperar el total CON IVA — ahora validan
+banda de precio + IVA juntos. **114 passed.** Verificado end-to-end en producción (subtotal 11000 +
+IVA 1760 = total 12760; Stripe cobra 12760).
+
+**Nota:** `create_manual` (admin) también aplica IVA, por consistencia. Si el admin alguna vez debe
+ingresar precios IVA-incluido, habría que ajustar ese flujo — pendiente de decisión si surge.
+
+---
+
 ## Fase 31p — Email de confirmación tras el pago (no dependía del webhook) (28 jun 2026)
 
 **Síntoma (Marlon):** al terminar la reserva solo llega el correo de "Pago Pendiente";
