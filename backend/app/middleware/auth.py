@@ -90,9 +90,12 @@ class AdminAuthMiddleware(BaseHTTPMiddleware):
                     detail="Autenticación requerida para acceder al panel de administración",
                 )
 
-        response = await call_next(request)
+        try:
+            response = await call_next(request)
+        except Exception:
+            raise
 
-        # Agregar headers CORS a todas las respuestas cross-origin
+        # Agregar headers CORS a todas las respuestas cross-origin (incluso errores)
         if origin:
             for key, value in self._cors_headers(origin).items():
                 response.headers.setdefault(key, value)
