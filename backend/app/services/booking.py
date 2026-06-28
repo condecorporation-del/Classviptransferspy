@@ -532,6 +532,28 @@ class BookingService:
         await self.db.commit()
         return await self.get_by_id(booking_id)
 
+    # ─── DELETE ──────────────────────────────────────────────
+
+    async def delete(self, booking_id: str) -> None:
+        """Borra una reserva de forma permanente (hard delete).
+
+        A diferencia de cancel() —que solo cambia el status a CANCELLED y deja
+        el registro— esto ELIMINA la fila. Las filas hijas se resuelven por las
+        reglas ondelete de las FK en la DB:
+          - items, payments, pricing_overrides, assignments, email_logs → CASCADE
+            (se borran junto con la reserva).
+          - account_charges, ai_conversations → SET NULL (el registro se conserva,
+            pierde el vínculo a la reserva borrada — no se pierde dinero/historial).
+
+        Es una acción irreversible; el endpoint que la expone exige admin + audit.
+
+        Raises:
+            NotFoundError: Si la reserva no existe (vía get_by_id).
+        """
+        booking = await self.get_by_id(booking_id)
+        await self.db.delete(booking)
+        await self.db.commit()
+
     # ─── CONFIRM ─────────────────────────────────────────────
 
     async def confirm(self, booking_id: str) -> Booking:

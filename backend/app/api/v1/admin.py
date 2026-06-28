@@ -304,6 +304,37 @@ async def cancel_booking(
     return booking
 
 
+@router.delete(
+    "/bookings/{booking_id}",
+    summary="Borrar una reserva permanentemente (hard delete)",
+)
+async def delete_booking(
+    booking_id: str,
+    db: AsyncSession = Depends(get_db),
+    admin: str = Depends(get_current_admin),
+):
+    """DELETE /api/v1/admin/bookings/{booking_id} (requiere auth).
+
+    Hard delete IRREVERSIBLE: elimina la reserva y sus hijos (items, pagos,
+    asignaciones, emails) vía CASCADE en la DB. Distinto de cancelar (que solo
+    cambia el status y conserva el registro). El log de auditoría se conserva
+    (entity_id no es FK, no cae con el CASCADE).
+    """
+    service = BookingService(db)
+    try:
+        booking = await service.get_by_id(booking_id)
+    except NotFoundError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=e.message)
+
+    # Auditar ANTES de borrar — capturamos el código mientras la fila existe.
+    code = booking.confirmation_code or booking_id[:8]
+    await _audit(
+        db, admin, AuditAction.DELETE, booking_id, f"Borró la reserva {code} permanentemente"
+    )
+    await service.delete(booking_id)
+    return {"deleted": True, "id": booking_id}
+
+
 @router.post(
     "/bookings/{booking_id}/assign",
     response_model=BookingResponse,

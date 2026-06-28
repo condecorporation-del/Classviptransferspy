@@ -3,7 +3,7 @@ import {
   Mail, ChevronRight, ArrowLeft, RefreshCw, FileDown,
   Search, Edit2, X, Save, UserCheck, CheckCircle, XCircle,
   Car, Calendar, Download, Loader2, CalendarX, AlertCircle,
-  Printer, ArrowRight, BadgeDollarSign, User, CreditCard, MessageSquare,
+  Printer, ArrowRight, BadgeDollarSign, User, CreditCard, MessageSquare, Trash2,
 } from 'lucide-react';
 import { useAdminAuth } from '@/features/admin/hooks/useAdminAuth';
 import {
@@ -510,6 +510,7 @@ export const AdminBookings = ({
             booking={bookingDetail}
             onRefresh={refreshAdminData}
             onRefetchDetail={() => fetchDetail(selectedId)}
+            onClose={() => { setSelectedId(null); setBookingDetail(null); }}
           />
         ) : (
           <div className="rounded-2xl border border-red-500/25 bg-red-500/10 p-10 text-center text-red-300 text-sm font-medium">
@@ -876,10 +877,12 @@ function BookingDetailView({
   booking,
   onRefresh,
   onRefetchDetail,
+  onClose,
 }: {
   booking: Booking;
   onRefresh: () => void;
   onRefetchDetail: () => void;
+  onClose: () => void;
 }) {
   const { getAuthHeaders } = useAdminAuth();
   const [busy, setBusy] = useState<string | null>(null);
@@ -912,6 +915,15 @@ function BookingDetailView({
       body: JSON.stringify(body),
     });
     const data = await res.json();
+    return { ok: res.ok, data, error: data?.detail };
+  };
+
+  const doDelete = async (path: string) => {
+    const res = await fetch(apiUrl(path), {
+      method: 'DELETE', credentials: 'include',
+      headers: { ...getAuthHeaders() },
+    });
+    const data = await res.json().catch(() => ({}));
     return { ok: res.ok, data, error: data?.detail };
   };
 
@@ -1083,6 +1095,21 @@ function BookingDetailView({
       const { ok, error } = await doPost(`/api/v1/admin/bookings/${booking.id}/cancel`, { reason: reason || undefined });
       if (ok) { flash('Booking cancelled'); onRefresh(); onRefetchDetail(); }
       else flash(error || 'Failed to cancel', true);
+    } finally { setBusy(null); }
+  };
+
+  const deleteBooking = async () => {
+    // Borrado PERMANENTE e irreversible: doble confirmación con el código de la
+    // reserva para evitar borrados accidentales. Distinto de Cancelar (que conserva
+    // el registro). Tras borrar, se cierra el detalle (la reserva ya no existe;
+    // refrescarla daría 404) y se refresca la lista.
+    const code = booking.confirmationCode || booking.id.slice(0, 8).toUpperCase();
+    if (!confirm(`¿BORRAR permanentemente la reserva ${code}?\n\nEsto NO se puede deshacer. Si solo quieres anularla, usa "Cancel".`)) return;
+    setBusy('delete');
+    try {
+      const { ok, error } = await doDelete(`/api/v1/admin/bookings/${booking.id}`);
+      if (ok) { flash('Reserva borrada'); onRefresh(); onClose(); }
+      else flash(error || 'No se pudo borrar la reserva', true);
     } finally { setBusy(null); }
   };
 
@@ -1321,6 +1348,14 @@ function BookingDetailView({
               className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-white/10 hover:bg-white/[0.06] text-white/80 text-sm font-medium transition-colors"
             >
               <UserCheck size={13} /> Assign Driver
+            </button>
+            <button
+              onClick={deleteBooking}
+              disabled={busy === 'delete'}
+              title="Borrar la reserva permanentemente (irreversible). Para anular sin borrar, usa Cancel."
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-600 text-white hover:bg-red-700 disabled:opacity-50 text-sm font-medium transition-colors"
+            >
+              <Trash2 size={13} /> {busy === 'delete' ? 'Borrando...' : 'Borrar'}
             </button>
             <button
               onClick={resendEmails}
