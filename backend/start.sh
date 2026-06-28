@@ -5,6 +5,12 @@
 # 3) Lanza uvicorn.
 set -euo pipefail
 
+# El paquete `app` instalado por `pip install .` solo incluye el nivel superior
+# (pyproject: packages = ["app"]), sin subpaquetes como app.core. Forzamos /app
+# al frente del PYTHONPATH para que los scripts resuelvan contra el código fuente
+# COMPLETO en /app/app, no contra el install parcial de site-packages.
+export PYTHONPATH="/app:${PYTHONPATH:-}"
+
 echo "==> Aplicando migraciones (alembic upgrade head)"
 alembic upgrade head
 
