@@ -60,7 +60,14 @@ app = FastAPI(
 # ─── CORS ─────────────────────────────────────────────────────────────────────
 # Permite que el frontend (en otro puerto/dominio) haga requests a la API.
 # Sin CORS, el navegador bloquea las llamadas cross-origin.
-origins = [o.strip() for o in settings.allowed_origins.split(",")]
+# Se agregan automáticamente FRONTEND_URL y localhost de dev a la lista para
+# no depender de que ALLOWED_ORIGINS esté perfectamente formateado.
+_extra = {settings.frontend_url.rstrip("/")} if settings.frontend_url else set()
+origins = list(
+    {o.strip().rstrip("/") for o in settings.allowed_origins.split(",") if o.strip()}
+    | _extra
+    | {"http://localhost:5173", "http://localhost:4173"}
+)
 
 app.add_middleware(
     CORSMiddleware,
