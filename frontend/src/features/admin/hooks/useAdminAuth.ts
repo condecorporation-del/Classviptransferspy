@@ -10,7 +10,7 @@ import {
 import type { ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getApiBaseUrl } from '@/shared/lib/api';
-import { clearAdminToken } from '@/features/admin/lib/adminSession';
+import { clearAdminToken, readAdminToken } from '@/features/admin/lib/adminSession';
 
 interface AuthState {
   authenticated: boolean;
@@ -53,7 +53,12 @@ async function fetchAdminAuthState(): Promise<AuthState> {
     try {
       const base = getApiBaseUrl();
       const url = `${base}/api/v1/auth/me`;
-      const response = await fetch(url, { credentials: 'include' });
+      // Token por header (funciona en móvil) + cookie (credentials) como respaldo.
+      const token = readAdminToken();
+      const response = await fetch(url, {
+        credentials: 'include',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
 
       if (!response.ok) {
         clearAdminToken();
@@ -142,8 +147,12 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     }
   }, [navigate]);
 
-  const getAuthHeaders = useCallback(() => {
-    return { 'Content-Type': 'application/json' };
+  const getAuthHeaders = useCallback((): Record<string, string> => {
+    const token = readAdminToken();
+    return {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    };
   }, []);
 
   const value = useMemo<AdminAuthContextValue>(() => ({

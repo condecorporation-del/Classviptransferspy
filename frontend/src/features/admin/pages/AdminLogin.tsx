@@ -4,6 +4,7 @@ import { Loader2, Lock, Mail } from "lucide-react";
 import { assets } from "@/shared/lib/assets";
 import { getApiBaseUrl } from "@/shared/lib/api";
 import { invalidateAdminAuthCache } from "@/features/admin/hooks/useAdminAuth";
+import { writeAdminToken } from "@/features/admin/lib/adminSession";
 
 const navyBg = {
   background: "linear-gradient(135deg, #080f1e 0%, #0d1f3c 60%, #080f1e 100%)",
@@ -33,6 +34,14 @@ export default function AdminLogin() {
       if (!res.ok) {
         const data = await res.json().catch(() => ({ detail: "Error" }));
         throw new Error(data.detail || "Credenciales inválidas");
+      }
+
+      // Guardar el token para mandarlo como header Authorization en cada request.
+      // Es lo que hace funcionar el panel en celular (la cookie cross-site se
+      // bloquea en Safari iOS / Chrome móvil). Ver adminSession.ts.
+      const data = await res.json().catch(() => null);
+      if (data?.access_token) {
+        writeAdminToken(data.access_token);
       }
 
       // Tras un login exitoso la cookie ya está puesta, pero el authCache
