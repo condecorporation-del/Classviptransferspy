@@ -243,7 +243,7 @@ class EmailService:
 
         params: resend.Emails.SendParams = {
             "from": settings.email_from,
-            "to": [settings.email_bcc or settings.admin_email],
+            "to": [settings.company_email],
             "subject": f"New Booking · Nueva Reserva — {booking.get('confirmation_code', '')}",
             "html": html_content,
         }

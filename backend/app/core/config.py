@@ -31,6 +31,8 @@ class Settings(BaseSettings):
     resend_api_key: str = ""
     email_from: str = "ClassVIP Transfers <bookings@classviptransfers.com>"
     email_bcc: str = ""
+    # Email de operaciones: recibe la notificación interna de cada nueva reserva.
+    company_email: str = "armando@classviptransfers.com"
 
     # ─── Frontend ───
     frontend_url: str = "http://localhost:5173"
