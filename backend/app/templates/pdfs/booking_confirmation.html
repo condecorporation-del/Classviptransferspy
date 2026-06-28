@@ -412,8 +412,9 @@
     {% endif %}
     <div class="total-row">
       <div class="total-box">
+        {% if tax %}<div class="t-misc">Subtotal: ${{ "%.2f"|format(subtotal) }} {{ currency }}</div>{% endif %}
         {% if discount %}<div class="t-misc">Descuento: -${{ "%.2f"|format(discount) }} {{ currency }}</div>{% endif %}
-        {% if tax %}<div class="t-misc">Impuestos: ${{ "%.2f"|format(tax) }} {{ currency }}</div>{% endif %}
+        {% if tax %}<div class="t-misc">IVA ({{ tax_rate_pct }}%): ${{ "%.2f"|format(tax) }} {{ currency }}</div>{% endif %}
         <div class="t-label">TOTAL</div>
         <div class="t-amount">${{ "%.2f"|format(total) }} <span class="t-cur">{{ currency }}</span></div>
       </div>

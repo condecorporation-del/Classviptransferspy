@@ -363,6 +363,11 @@ export default function Checkout() {
   }
 
   const totalDollars = (booking.totalAmount / 100).toFixed(2);
+  // % de IVA derivado de los montos reales del backend (no hardcodeado) para que
+  // siempre coincida con lo cobrado, aunque cambie la tasa.
+  const ivaPct = booking.subtotalAmount > 0
+    ? Math.round((booking.taxAmount / booking.subtotalAmount) * 100)
+    : 16;
 
   const stripeAppearance = {
     theme: 'stripe' as const,
@@ -440,6 +445,20 @@ export default function Checkout() {
               </div>
             ))}
           </div>
+
+          {/* Desglose de IVA: solo si el backend mandó impuesto (> 0). */}
+          {booking.taxAmount > 0 && (
+            <div className="space-y-2 border-t border-border/40 px-5 py-3 text-sm">
+              <div className="flex items-center justify-between text-muted-foreground">
+                <span>Subtotal</span>
+                <span>${(booking.subtotalAmount / 100).toFixed(2)}</span>
+              </div>
+              <div className="flex items-center justify-between text-muted-foreground">
+                <span>{normalizedLang === 'es' ? `IVA (${ivaPct}%)` : `Tax · IVA (${ivaPct}%)`}</span>
+                <span>${(booking.taxAmount / 100).toFixed(2)}</span>
+              </div>
+            </div>
+          )}
 
           <div
             className="flex items-center justify-between border-t border-gold/20 px-5 py-4"

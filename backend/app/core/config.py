@@ -34,6 +34,11 @@ class Settings(BaseSettings):
     # Email de operaciones: recibe la notificación interna de cada nueva reserva.
     company_email: str = "armando@classviptransfers.com"
 
+    # ─── Impuestos ───
+    # IVA México (16%). Se suma sobre el subtotal de cada reserva. Configurable
+    # por si cambia la tasa o se opera en otra jurisdicción.
+    tax_rate: float = 0.16
+
     # ─── Frontend ───
     frontend_url: str = "http://localhost:5173"
     allowed_origins: str = "http://localhost:5173,http://localhost:4173"

@@ -92,6 +92,9 @@ const Confirmation = () => {
   const dropoff = booking?.dropoffLocation || '';
   const totalCents = booking?.totalAmountCents ?? booking?.totalAmount ?? 0;
   const total = (totalCents / 100).toFixed(2);
+  const taxCents = booking?.taxAmount ?? 0;
+  const subtotalCents = booking?.subtotalAmount ?? totalCents;
+  const ivaPct = subtotalCents > 0 ? Math.round((taxCents / subtotalCents) * 100) : 16;
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4 py-32">
@@ -132,6 +135,16 @@ const Confirmation = () => {
                 <p>
                   {lang === 'es' ? 'Destino' : 'Dropoff'}: <span className="font-medium">{dropoff}</span>
                 </p>
+              )}
+              {taxCents > 0 && (
+                <>
+                  <p>
+                    Subtotal: <span className="font-medium">${(subtotalCents / 100).toFixed(2)} USD</span>
+                  </p>
+                  <p>
+                    {lang === 'es' ? `IVA (${ivaPct}%)` : `Tax · IVA (${ivaPct}%)`}: <span className="font-medium">${(taxCents / 100).toFixed(2)} USD</span>
+                  </p>
+                </>
               )}
               {totalCents > 0 && (
                 <p>

@@ -242,7 +242,13 @@ const Book = () => {
     }, 0);
   }, [data.extras, pricingExtras]);
 
+  // `total` es el SUBTOTAL (sin IVA). El backend agrega el 16% al crear la
+  // reserva; lo mostramos aquí también para que el precio del formulario coincida
+  // con el del checkout y no haya un salto sorpresa al pagar.
+  const IVA_RATE = 0.16;
   const total = transferPrice + activitiesPrice + extrasPrice;
+  const ivaAmount = total * IVA_RATE;
+  const grandTotal = total + ivaAmount;
 
   // Create booking and continue to Stripe checkout
   const handleStripeCheckout = async () => {
@@ -1634,10 +1640,24 @@ const Book = () => {
                   </div>
                 )}
 
+                {/* Subtotal + IVA */}
+                {total > 0 && (
+                  <div className="space-y-1.5 pt-2 border-t border-border">
+                    <div className="flex justify-between items-center text-sm text-muted-foreground">
+                      <span>Subtotal</span>
+                      <span>${total.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm text-muted-foreground">
+                      <span>{lang === 'es' ? 'IVA (16%)' : 'Tax · IVA (16%)'}</span>
+                      <span>${ivaAmount.toFixed(2)}</span>
+                    </div>
+                  </div>
+                )}
+
                 {/* Total */}
                 <div className="flex justify-between items-center pt-3 mt-1 border-t-2 border-gold/30">
                   <span className="font-display font-bold text-base text-foreground">{t('book.review.total')}</span>
-                  <span className="font-display font-bold text-2xl text-gold">${Math.round(total)} USD</span>
+                  <span className="font-display font-bold text-2xl text-gold">${grandTotal.toFixed(2)} USD</span>
                 </div>
               </div>
             </motion.div>
@@ -2026,7 +2046,7 @@ const Book = () => {
             <ChevronUp size={16} className={cn("text-muted-foreground transition-transform", mobileOpen && "rotate-180")} />
             <span className="text-sm font-semibold text-foreground">{t('book.summary')}</span>
           </div>
-          <span className="text-gold font-bold text-lg">${Math.round(total)} USD</span>
+          <span className="text-gold font-bold text-lg">${grandTotal.toFixed(2)} USD</span>
         </button>
 
         <AnimatePresence>

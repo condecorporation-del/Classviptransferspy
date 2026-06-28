@@ -124,6 +124,7 @@ def build_confirmation_context(booking: dict, payment_method: str | None = None)
         "subtotal_text": _money(subtotal, currency),
         "discount_text": _money(discount, currency) if discount else "",
         "tax_text": _money(tax, currency) if tax else "",
+        "tax_rate_pct": round(settings.tax_rate * 100),
         "total_text": _money(booking.get("total_amount"), currency),
         "payment_method_text": pm_text,
         "show_stripe_icon": show_stripe,

@@ -61,6 +61,11 @@ class PDFService:
 
         legs = build_operation_legs(booking)
 
+        # % de IVA derivado de los montos reales (robusto si cambia la tasa).
+        _sub = booking.get("subtotal_amount") or 0
+        _tax = booking.get("tax_amount") or 0
+        tax_rate_pct = round(_tax / _sub * 100) if _sub else 16
+
         html_content = template.render(
             booking=booking,
             confirmation_code=booking.get("confirmation_code", ""),
@@ -71,6 +76,7 @@ class PDFService:
             subtotal=cents_to_usd(booking.get("subtotal_amount")),
             discount=cents_to_usd(booking.get("discount_amount")),
             tax=cents_to_usd(booking.get("tax_amount")),
+            tax_rate_pct=tax_rate_pct,
             currency=booking.get("currency", "USD"),
             logo_data_uri=_LOGO_DATA_URI,
         )

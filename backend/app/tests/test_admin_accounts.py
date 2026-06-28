@@ -145,37 +145,38 @@ async def test_open_credit_full_flow_booking_to_settled(client: AsyncClient):
         )
     ).json()["id"]
 
-    # 2) Dos servicios del mes, cargados desde reservas reales.
-    booking1 = await _create_booking(client, "credito-1@example.com")  # total 5000
-    booking2 = await _create_booking(client, "credito-2@example.com")  # total 5000
+    # 2) Dos servicios del mes, cargados desde reservas reales. Cada reserva tiene
+    #    subtotal 5000 + IVA 16% (800) = total 5800; el cargo usa el total con IVA.
+    booking1 = await _create_booking(client, "credito-1@example.com")  # total 5800
+    booking2 = await _create_booking(client, "credito-2@example.com")  # total 5800
 
     after1 = await client.post(
         f"/api/v1/admin/accounts/{account_id}/bookings", json={"booking_id": booking1["id"]}
     )
-    assert after1.json()["balance_cents"] == 5000
+    assert after1.json()["balance_cents"] == 5800
 
     after2 = await client.post(
         f"/api/v1/admin/accounts/{account_id}/bookings", json={"booking_id": booking2["id"]}
     )
     detail = after2.json()
-    assert detail["balance_cents"] == 10000
-    assert detail["totals"]["charges_cents"] == 10000
+    assert detail["balance_cents"] == 11600
+    assert detail["totals"]["charges_cents"] == 11600
 
     # 3) Fin de mes: abono parcial.
     after_partial = await client.post(
         f"/api/v1/admin/accounts/{account_id}/payments",
         json={"amount_cents": 4000, "method": "BANK_TRANSFER", "reference": "SPEI-001"},
     )
-    assert after_partial.json()["balance_cents"] == 6000
+    assert after_partial.json()["balance_cents"] == 7600
 
     # 4) Abono del resto → saldo 0.
     after_full = await client.post(
         f"/api/v1/admin/accounts/{account_id}/payments",
-        json={"amount_cents": 6000, "method": "BANK_TRANSFER", "reference": "SPEI-002"},
+        json={"amount_cents": 7600, "method": "BANK_TRANSFER", "reference": "SPEI-002"},
     )
     settled = after_full.json()
     assert settled["balance_cents"] == 0
-    assert settled["totals"]["payments_cents"] == 10000
+    assert settled["totals"]["payments_cents"] == 11600
     assert len(settled["payments"]) == 2
 
     # 5) Los cargos cobrados se pueden marcar PAID (sin alterar el balance, que

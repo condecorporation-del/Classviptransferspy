@@ -39,7 +39,22 @@ from app.schemas.booking import (
     MarkPaidRequest,
     UpdateBookingRequest,
 )
+from app.core.config import get_settings
 from app.services.customer import CustomerService
+
+_settings = get_settings()
+
+
+def _split_tax(subtotal_cents: int) -> tuple[int, int]:
+    """Aplica el IVA (settings.tax_rate) sobre un subtotal en centavos.
+
+    Devuelve (tax_cents, total_cents). El impuesto se redondea al centavo más
+    cercano. El IVA se SUMA sobre el subtotal (no va incluido) — así el cliente
+    ve el desglose y Stripe cobra el total con impuesto.
+    """
+    tax_cents = round(subtotal_cents * _settings.tax_rate)
+    return tax_cents, subtotal_cents + tax_cents
+
 
 # Catálogo server-side de combos — debe coincidir EXACTAMENTE con los
 # precios hardcodeados en frontend/.../pages/Book.tsx (no hay tabla en DB
@@ -235,8 +250,13 @@ class BookingService:
                     total += total_price
 
                 if data.items:
-                    booking.total_amount = total
+                    # IVA 16%: el `total` acumulado es el SUBTOTAL (suma de items,
+                    # ya con precios recalculados server-side). El impuesto se suma
+                    # encima y queda desglosado en subtotal/tax/total.
+                    tax, grand_total = _split_tax(total)
                     booking.subtotal_amount = total
+                    booking.tax_amount = tax
+                    booking.total_amount = grand_total
 
                 await self.db.commit()
             except IntegrityError:
@@ -335,8 +355,12 @@ class BookingService:
                     total += item_data.total_price
 
                 if data.items:
-                    booking.total_amount = total
+                    # IVA 16% sobre el subtotal, igual que en create_draft, para que
+                    # las reservas de admin muestren el mismo desglose en la confirmación.
+                    tax, grand_total = _split_tax(total)
                     booking.subtotal_amount = total
+                    booking.tax_amount = tax
+                    booking.total_amount = grand_total
 
                 await self.db.commit()
             except IntegrityError:

@@ -40,7 +40,10 @@ async def test_create_booking_success(client: AsyncClient):
     assert data["status"] == "DRAFT"
     assert data["confirmation_code"] is not None
     assert data["confirmation_code"].startswith("CLASS2026")
-    assert data["total_amount"] == 15000
+    # Subtotal = suma de items; total = subtotal + IVA 16% (15000 + 2400 = 17400).
+    assert data["subtotal_amount"] == 15000
+    assert data["tax_amount"] == 2400
+    assert data["total_amount"] == 17400
     assert data["passengers"] == 3
 
 

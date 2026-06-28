@@ -10,11 +10,18 @@ server-side desde el área, ignorando lo que mande el navegador.
 import pytest
 from httpx import AsyncClient
 
-# Precios de prueba del área (en centavos).
+# Precios de prueba del área (en centavos). Son el SUBTOTAL (antes de IVA).
 OW_1_5 = 10000  # 1-5 pax, ida
 RT_1_5 = 18000  # 1-5 pax, redondo
 OW_6_11 = 14500  # 6-11 pax, ida
 RT_6_11 = 26100  # 6-11 pax, redondo
+
+IVA_RATE = 0.16
+
+
+def _with_iva(subtotal_cents: int) -> int:
+    """Total con IVA 16% — mismo cálculo que _split_tax en el servicio."""
+    return subtotal_cents + round(subtotal_cents * IVA_RATE)
 
 
 async def _login_as_admin(client: AsyncClient) -> None:
@@ -75,7 +82,8 @@ async def test_one_way_1_to_5_pax_uses_area_one_way(client: AsyncClient):
         "/api/v1/bookings/", json=_booking_payload(area_id, passengers=5, trip_type="oneway")
     )
     assert resp.status_code == 201
-    assert resp.json()["total_amount"] == OW_1_5
+    assert resp.json()["subtotal_amount"] == OW_1_5
+    assert resp.json()["total_amount"] == _with_iva(OW_1_5)
 
 
 @pytest.mark.asyncio
@@ -85,7 +93,8 @@ async def test_round_trip_1_to_5_pax_uses_area_round_trip(client: AsyncClient):
         "/api/v1/bookings/", json=_booking_payload(area_id, passengers=4, trip_type="roundtrip")
     )
     assert resp.status_code == 201
-    assert resp.json()["total_amount"] == RT_1_5
+    assert resp.json()["subtotal_amount"] == RT_1_5
+    assert resp.json()["total_amount"] == _with_iva(RT_1_5)
 
 
 @pytest.mark.asyncio
@@ -96,7 +105,8 @@ async def test_6_pax_uses_sprinter_one_way_band(client: AsyncClient):
         "/api/v1/bookings/", json=_booking_payload(area_id, passengers=6, trip_type="oneway")
     )
     assert resp.status_code == 201
-    assert resp.json()["total_amount"] == OW_6_11
+    assert resp.json()["subtotal_amount"] == OW_6_11
+    assert resp.json()["total_amount"] == _with_iva(OW_6_11)
 
 
 @pytest.mark.asyncio
@@ -106,7 +116,8 @@ async def test_6_pax_round_trip_uses_sprinter_round_trip_band(client: AsyncClien
         "/api/v1/bookings/", json=_booking_payload(area_id, passengers=8, trip_type="roundtrip")
     )
     assert resp.status_code == 201
-    assert resp.json()["total_amount"] == RT_6_11
+    assert resp.json()["subtotal_amount"] == RT_6_11
+    assert resp.json()["total_amount"] == _with_iva(RT_6_11)
 
 
 @pytest.mark.asyncio
@@ -118,7 +129,8 @@ async def test_server_ignores_client_sent_price(client: AsyncClient):
     )
     assert resp.status_code == 201
     data = resp.json()
-    assert data["total_amount"] == OW_1_5
+    assert data["subtotal_amount"] == OW_1_5
+    assert data["total_amount"] == _with_iva(OW_1_5)
     assert data["items"][0]["total_price"] == OW_1_5
 
 

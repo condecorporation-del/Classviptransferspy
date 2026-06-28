@@ -33,6 +33,10 @@ export type ApiBooking = {
   totalAmount: number;
   /** Alias de totalAmount (centavos) — algunas páginas leen este nombre. */
   totalAmountCents: number;
+  /** Subtotal en centavos (antes de IVA). */
+  subtotalAmount: number;
+  /** IVA en centavos. */
+  taxAmount: number;
   passengers?: number;
   customer?: { name: string; email: string; phone: string } | null;
   items: ApiBookingItem[];
@@ -61,6 +65,8 @@ interface RawBooking {
   pickup_location?: string;
   dropoff_location?: string;
   total_amount?: number;
+  subtotal_amount?: number | null;
+  tax_amount?: number | null;
   passengers?: number;
   customer?: { name: string; email: string; phone: string } | null;
   items?: RawBookingItem[];
@@ -69,6 +75,9 @@ interface RawBooking {
 /** Convierte la respuesta snake_case del backend a la forma camelCase que esperan las páginas. */
 export function mapBookingResponse(raw: RawBooking): ApiBooking {
   const totalCents = raw?.total_amount ?? 0;
+  // Si el backend no manda subtotal (reservas viejas), cae al total para no romper.
+  const subtotalCents = raw?.subtotal_amount ?? totalCents;
+  const taxCents = raw?.tax_amount ?? 0;
   return {
     id: raw?.id ?? '',
     type: raw?.type,
@@ -81,6 +90,8 @@ export function mapBookingResponse(raw: RawBooking): ApiBooking {
     dropoffLocation: raw?.dropoff_location ?? '',
     totalAmount: totalCents,
     totalAmountCents: totalCents,
+    subtotalAmount: subtotalCents,
+    taxAmount: taxCents,
     passengers: raw?.passengers,
     customer: raw?.customer ?? null,
     items: (raw?.items ?? []).map((it: RawBookingItem) => ({

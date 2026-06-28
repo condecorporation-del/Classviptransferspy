@@ -80,7 +80,8 @@ async def test_mark_booking_paid_records_payment_and_sets_status(client: AsyncCl
     payments = data["payments"]
     assert len(payments) == 1
     assert payments[0]["status"] == "COMPLETED"
-    assert payments[0]["amount"] == 12000
+    # El total incluye IVA 16%: 12000 + 1920 = 13920.
+    assert payments[0]["amount"] == 13920
 
 
 @pytest.mark.asyncio
@@ -267,7 +268,9 @@ async def test_manual_booking_cash_is_confirmed(client: AsyncClient):
     data = response.json()
     assert data["payment_method"] == "cash"
     assert data["booking"]["status"] == "CONFIRMED"
-    assert data["booking"]["total_amount"] == 12000
+    # Total con IVA 16%: 12000 + 1920 = 13920.
+    assert data["booking"]["subtotal_amount"] == 12000
+    assert data["booking"]["total_amount"] == 13920
     # Sin RESEND_API_KEY real en test, el email no sale pero la reserva sí se crea
     assert data["email_sent"] is False
 

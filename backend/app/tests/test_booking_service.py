@@ -46,7 +46,10 @@ async def test_create_manual_then_get_by_id(db_session):
     booking = await svc.create_manual(_manual_req(), status=BookingStatus.CONFIRMED)
     assert booking.status == BookingStatus.CONFIRMED
     assert booking.confirmation_code is not None
-    assert booking.total_amount == 12000
+    # create_manual también aplica IVA 16%: 12000 + 1920 = 13920.
+    assert booking.subtotal_amount == 12000
+    assert booking.tax_amount == 1920
+    assert booking.total_amount == 13920
 
     fetched = await svc.get_by_id(booking.id)
     assert fetched.id == booking.id
