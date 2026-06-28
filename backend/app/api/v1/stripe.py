@@ -36,12 +36,14 @@ async def create_payment_intent(
     }
     """
     body = await request.json()
-    booking_id = body.get("booking_id")
+    # El frontend habla camelCase (bookingId); aceptamos también snake_case por
+    # compatibilidad. Mismo criterio que confirm-payment más abajo.
+    booking_id = body.get("bookingId") or body.get("booking_id")
 
     if not booking_id:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="booking_id es requerido",
+            detail="bookingId es requerido",
         )
 
     # Obtener la reserva

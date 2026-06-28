@@ -339,8 +339,10 @@ export default function Checkout() {
         throw new Error(intentError.error || checkoutCopy.loadFailure[normalizedLang]);
       }
 
+      // El backend devuelve { client_secret, payment_intent_id } DIRECTO,
+      // sin envoltorio `.data` (mismo criterio que el resto de la API).
       const intentData = await intentRes.json();
-      setClientSecret(intentData.data.clientSecret);
+      setClientSecret(intentData.client_secret);
     } catch (loadError) {
       setError(getErrorMessage(loadError, checkoutCopy.loadFailure[normalizedLang]));
     } finally {
