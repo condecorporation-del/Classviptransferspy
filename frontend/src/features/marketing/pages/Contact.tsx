@@ -37,6 +37,15 @@ const contactLd = {
   },
 };
 
+const contactBreadcrumbLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://www.classviptransfers.com/' },
+    { '@type': 'ListItem', position: 2, name: 'Contact', item: 'https://www.classviptransfers.com/contact' },
+  ],
+};
+
 const Contact = () => {
   const { t, lang } = useLanguage();
   const [form, setForm] = useState({ name: '', email: '', message: '' });
@@ -80,7 +89,7 @@ const Contact = () => {
         description="Contact Class VIP Transfers in Los Cabos. WhatsApp, iMessage or email. Available 24/7 for airport transfers and activity bookings."
         keywords="contact class vip transfers, los cabos transfer contact, cabo whatsapp transfer, cabo airport contact"
         canonical="https://www.classviptransfers.com/contact"
-        jsonLd={contactLd}
+        jsonLd={[contactLd, contactBreadcrumbLd]}
       />
       {/* Hero - dark */}
       <section className="navy-gradient pt-36 pb-20 px-4">

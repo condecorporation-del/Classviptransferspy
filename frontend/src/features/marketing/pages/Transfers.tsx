@@ -113,6 +113,15 @@ const Transfers = () => {
       'Private airport transportation in Los Cabos with premium Transit comfort, flight tracking, bilingual drivers, and door-to-door service.',
   };
 
+  const breadcrumbLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://www.classviptransfers.com/' },
+      { '@type': 'ListItem', position: 2, name: 'Airport Transfers', item: 'https://www.classviptransfers.com/transfers' },
+    ],
+  };
+
   return (
     <>
       <SEO
@@ -120,7 +129,7 @@ const Transfers = () => {
         description="Private airport transportation in Los Cabos with premium Transit comfort, flight tracking, bilingual drivers, and door-to-door service from SJD Airport to any hotel."
         keywords="SJD airport transfer, Los Cabos private transfer, Cabo airport transportation, private airport ride, VIP transit Los Cabos, Los Cabos chauffeur"
         canonical="https://www.classviptransfers.com/transfers"
-        jsonLd={serviceLd}
+        jsonLd={[serviceLd, breadcrumbLd]}
       />
 
       <div className="bg-background">

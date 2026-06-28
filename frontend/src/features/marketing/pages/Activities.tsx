@@ -113,6 +113,15 @@ const activitiesLd = {
   ],
 };
 
+const activitiesBreadcrumbLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://www.classviptransfers.com/' },
+    { '@type': 'ListItem', position: 2, name: 'Activities & Tours', item: 'https://www.classviptransfers.com/activities' },
+  ],
+};
+
 const Activities = () => {
   const { t } = useLanguage();
   const [currentHero, setCurrentHero] = useState(0);
@@ -131,7 +140,7 @@ const Activities = () => {
         description="Book ATV, camel safari, horseback riding, Sky Bikes (Guinness Record) & RZR in Los Cabos. Combo deals from $100/person. Round-trip transport included."
         keywords="ATV tour los cabos, cabo activities, UTV cabo san lucas, horseback riding cabo, camel safari los cabos, sky bikes cabo, cabo adventure tours, things to do cabo san lucas, cactus tours los cabos"
         canonical="https://www.classviptransfers.com/activities"
-        jsonLd={activitiesLd}
+        jsonLd={[activitiesLd, activitiesBreadcrumbLd]}
       />
 
       {/* ===== HERO ===== */}

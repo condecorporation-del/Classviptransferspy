@@ -260,13 +260,20 @@ const Portfolio = () => {
             : 'Custom all-inclusive packages with villa, transportation, and activities, plus rental properties and homes for sale in Los Cabos.'
         }
         canonical="https://www.classviptransfers.com/portfolio"
-        jsonLd={{
+        jsonLd={[{
           '@context': 'https://schema.org',
           '@type': 'CollectionPage',
           name: 'Class VIP Portfolio',
           description: 'Custom villa packages, rental properties, and properties for sale in Los Cabos.',
           url: 'https://www.classviptransfers.com/portfolio',
-        }}
+        }, {
+          '@context': 'https://schema.org',
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://www.classviptransfers.com/' },
+            { '@type': 'ListItem', position: 2, name: 'Portfolio', item: 'https://www.classviptransfers.com/portfolio' },
+          ],
+        }]}
       />
 
       <div className="bg-background">

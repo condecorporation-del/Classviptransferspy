@@ -1741,7 +1741,7 @@ const Book = () => {
         description="Book your private luxury airport transfer in Los Cabos in minutes. Choose your vehicle, route, date, and extras. Secure payment via Stripe."
         keywords="book cabo transfer, reserve los cabos transportation, cabo airport pickup, private driver reservation los cabos"
         canonical="https://www.classviptransfers.com/book"
-        jsonLd={{
+        jsonLd={[{
           '@context': 'https://schema.org',
           '@type': 'Service',
           name: 'Book a Private Airport Transfer — Los Cabos',
@@ -1749,7 +1749,14 @@ const Book = () => {
           areaServed: { '@type': 'Place', name: 'Los Cabos, Baja California Sur, Mexico' },
           description: 'Book a private luxury transfer from SJD Airport to your hotel in Los Cabos.',
           offers: { '@type': 'Offer', priceCurrency: 'USD', price: '90', priceValidUntil: '2027-12-31' },
-        }}
+        }, {
+          '@context': 'https://schema.org',
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://www.classviptransfers.com/' },
+            { '@type': 'ListItem', position: 2, name: 'Book', item: 'https://www.classviptransfers.com/book' },
+          ],
+        }]}
       />
       <div className="container mx-auto max-w-5xl">
         {/* Header */}
