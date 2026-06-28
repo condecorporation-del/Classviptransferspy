@@ -1,5 +1,7 @@
 """Endpoints de Stripe — PaymentIntent y webhook."""
 
+import logging
+
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -11,6 +13,7 @@ from app.services.booking import BookingService
 from app.services.payment import PaymentService
 from app.services.stripe import StripeService
 
+logger = logging.getLogger(__name__)
 router = APIRouter()
 stripe_service = StripeService()
 
@@ -139,17 +142,43 @@ async def confirm_payment(
     payment_service = PaymentService(db)
     payments = await payment_service.get_payments_for_booking(booking_id)
     stripe_payment = next((p for p in payments if p.provider == PaymentProvider.STRIPE), None)
+    just_paid = False
     if stripe_payment and stripe_payment.status == PaymentStatus.PENDING:
         try:
             await payment_service.mark_completed(
                 stripe_payment.id, transaction_id=payment_intent_id
             )
+            just_paid = True
         except ValidationError:
             # El webhook ganó la carrera y ya lo completó — no es un error.
             pass
 
     booking_service = BookingService(db)
     booking = await booking_service.get_by_id(booking_id)
+
+    # Enviar la confirmación al cliente + aviso a operaciones SOLO si fue ESTE
+    # request el que completó el pago (just_paid). Así es idempotente con el
+    # webhook: el que gane la carrera de mark_completed manda los correos una
+    # sola vez (el otro ve el pago ya completado y no duplica). Esto cubre el
+    # caso —común— de que el webhook de Stripe no esté configurado en producción:
+    # sin esto, la confirmación nunca se enviaría. Best-effort: un fallo de email
+    # nunca debe romper la confirmación del pago (Stripe ya cobró).
+    if just_paid:
+        try:
+            from app.api.v1.bookings import _booking_to_dict
+            from app.services.email import EmailService
+
+            booking_dict = _booking_to_dict(booking)
+            email_service = EmailService()
+            await email_service.send_booking_confirmation(booking_dict, payment_method="stripe")
+            await email_service.send_company_notification(booking_dict, payment_method="stripe")
+        except Exception as exc:  # noqa: BLE001 — email best-effort
+            logger.warning(
+                "Email de confirmación/operaciones tras pago (booking %s) no enviado: %s",
+                booking_id,
+                exc,
+            )
+
     return {"status": "ok", "bookingStatus": booking.status.value}
 
 
