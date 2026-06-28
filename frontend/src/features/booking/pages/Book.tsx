@@ -390,7 +390,10 @@ const Book = () => {
       }
 
       const result = await response.json();
-      const bookingId = result.data?.id;
+      // El backend devuelve el booking DIRECTO (BookingResponse), sin envoltorio
+      // `.data`. El GET de reservas es público, así que no hay lookupToken en este
+      // backend — se deja opcional por compatibilidad (queda undefined sin romper).
+      const bookingId = result.id;
       const lookupToken = result.lookupToken;
 
       if (!bookingId) {
