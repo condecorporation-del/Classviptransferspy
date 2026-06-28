@@ -28,8 +28,15 @@ target_metadata = Base.metadata
 # transacciones) — DDL necesita prepared statements y conexión estable que
 # el Transaction Pooler de Supabase no garantiza. Si DATABASE_URL_DIRECT no
 # está configurada, caemos a DATABASE_URL (caso típico: dev local / Session pooler).
+def _asyncpg_url(url: str) -> str:
+    for prefix in ("postgresql://", "postgres://"):
+        if url.startswith(prefix):
+            return "postgresql+asyncpg://" + url[len(prefix):]
+    return url
+
 _settings = get_settings()
-_migration_url = _settings.database_url_direct or _settings.database_url
+_raw_url = _settings.database_url_direct or _settings.database_url
+_migration_url = _asyncpg_url(_raw_url)
 config.set_main_option("sqlalchemy.url", _migration_url)
 
 # Mismo criterio que app/database.py: solo exigir SSL si no es Postgres local.

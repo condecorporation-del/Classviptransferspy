@@ -8,6 +8,17 @@ from app.core.config import get_settings
 
 settings = get_settings()
 
+# Railway (y otras plataformas) inyectan DATABASE_URL con prefijo postgresql://
+# o postgres:// sin especificar el driver. create_async_engine requiere
+# postgresql+asyncpg://. Si el prefijo no lo incluye, lo corregimos aquí.
+def _asyncpg_url(url: str) -> str:
+    for prefix in ("postgresql://", "postgres://"):
+        if url.startswith(prefix):
+            return "postgresql+asyncpg://" + url[len(prefix):]
+    return url
+
+_database_url = _asyncpg_url(settings.database_url)
+
 # ─── Engine ───────────────────────────────────────────────────────────────────
 # El engine es el "motor" que conecta SQLAlchemy con PostgreSQL.
 # create_async_engine usa asyncpg por debajo para operaciones no bloqueantes.
@@ -24,10 +35,10 @@ settings = get_settings()
 #   "Prepared Statement Name with PGBouncer") es generar nombres únicos con
 #   uuid4 en vez de dejar la numeración por defecto, además de NullPool para
 #   no mantener conexiones "fantasma" entre requests.
-_is_transaction_pooler = ":6543" in settings.database_url
+_is_transaction_pooler = ":6543" in _database_url
 # Postgres local (docker-compose, dev en la máquina) no tiene TLS configurado.
 # Solo exigimos SSL cuando el host no es localhost (es decir, cuando es Supabase real).
-_is_local_host = any(h in settings.database_url for h in ("@localhost", "@127.0.0.1", "@db:"))
+_is_local_host = any(h in _database_url for h in ("@localhost", "@127.0.0.1", "@db:"))
 
 _connect_args: dict = {} if _is_local_host else {"ssl": "require"}
 if _is_transaction_pooler:
@@ -49,7 +60,7 @@ else:
     }
 
 engine = create_async_engine(
-    settings.database_url,
+    _database_url,
     echo=settings.environment == "development",  # Muestra SQL en consola en dev
     connect_args=_connect_args,
     **_pool_kwargs,
