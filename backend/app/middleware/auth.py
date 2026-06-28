@@ -40,11 +40,27 @@ class AdminAuthMiddleware(BaseHTTPMiddleware):
     JavaScript no puede leerlas. Más seguro contra XSS que localStorage.
     """
 
+    @staticmethod
+    def _cors_headers(origin: str) -> dict:
+        return {
+            "Access-Control-Allow-Origin": origin,
+            "Access-Control-Allow-Credentials": "true",
+            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type, Authorization, Cookie, X-Requested-With",
+            "Access-Control-Max-Age": "86400",
+            "Vary": "Origin",
+        }
+
     async def dispatch(self, request: Request, call_next):
-        # Los preflights CORS (OPTIONS) nunca llevan cookie — dejarlos pasar
-        # para que CORSMiddleware los responda con los headers correctos.
+        origin = request.headers.get("origin", "")
+
+        # Preflights CORS: responder directamente sin tocar auth ni rutas.
         if request.method == "OPTIONS":
-            return await call_next(request)
+            from starlette.responses import Response as StarletteResponse
+            return StarletteResponse(
+                status_code=200,
+                headers=self._cors_headers(origin) if origin else {},
+            )
 
         # Inicializar sin autenticación
         request.state.admin_email = None
@@ -75,4 +91,10 @@ class AdminAuthMiddleware(BaseHTTPMiddleware):
                 )
 
         response = await call_next(request)
+
+        # Agregar headers CORS a todas las respuestas cross-origin
+        if origin:
+            for key, value in self._cors_headers(origin).items():
+                response.headers.setdefault(key, value)
+
         return response

@@ -3,7 +3,6 @@ from contextlib import asynccontextmanager
 from datetime import UTC, datetime
 
 from fastapi import FastAPI, Request, Response, status
-from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
@@ -78,23 +77,8 @@ app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.add_middleware(SlowAPIMiddleware)
 
-# ─── CORS — debe ser el último en agregarse (primero en ejecutarse) ───────────
-# Se agregan FRONTEND_URL y localhost automáticamente para no depender de que
-# ALLOWED_ORIGINS esté perfectamente formateado.
-_extra = {settings.frontend_url.rstrip("/")} if settings.frontend_url else set()
-origins = list(
-    {o.strip().rstrip("/") for o in settings.allowed_origins.split(",") if o.strip()}
-    | _extra
-    | {"http://localhost:5173", "http://localhost:4173"}
-)
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# CORS manejado directamente en AdminAuthMiddleware para evitar conflictos
+# con BaseHTTPMiddleware. Ver app/middleware/auth.py.
 
 
 # ─── IntegrityError → 409 ─────────────────────────────────────────────────────
@@ -109,27 +93,6 @@ async def integrity_error_handler(request: Request, exc: IntegrityError):
     return JSONResponse(
         status_code=status.HTTP_409_CONFLICT,
         content={"detail": "El recurso ya existe o viola una restricción de unicidad."},
-    )
-
-
-# ─── Preflight CORS catch-all ─────────────────────────────────────────────────
-# Responde todos los OPTIONS devolviendo el mismo Origin que llegó.
-# La seguridad real está en la autenticación JWT del lado del servidor,
-# no en el preflight — cualquier origen puede preguntar, pero solo
-# requests con cookie válida acceden a los endpoints protegidos.
-@app.options("/{path:path}")
-async def _cors_preflight(request: Request, path: str) -> Response:
-    origin = request.headers.get("origin", "*")
-    return Response(
-        status_code=200,
-        headers={
-            "Access-Control-Allow-Origin": origin,
-            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
-            "Access-Control-Allow-Headers": "Content-Type, Authorization, Cookie, X-Requested-With",
-            "Access-Control-Allow-Credentials": "true",
-            "Access-Control-Max-Age": "86400",
-            "Vary": "Origin",
-        },
     )
 
 
