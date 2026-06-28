@@ -164,12 +164,18 @@ ruta en build). Opciones, en orden de menor a mayor fricción:
 > - **FASE SEO-3 (landing pages por hotel):** necesita decisiones de contenido/datos (qué hoteles,
 >   slugs, textos) — no es trabajo autónomo. Plan propio cuando Marlon lo arranque.
 
-**FASE SEO-2 — Prerender estático (la decisión grande de arriba)**
-- [ ] Integrar prerender de rutas públicas conocidas (Home, Transfers, Activities, Portfolio,
-      Contact). Admin/checkout NO se prerenderean (privados).
-- [ ] Validar que el HTML estático trae title/description/OG/JSON-LD correctos por ruta
-      (test: `curl` la URL y ver el `<head>` sin ejecutar JS).
-- [ ] Regla dura: la hidratación de React debe seguir funcionando idéntica (sin romper booking).
+**FASE SEO-2 — Prerender / visibilidad sin JS** — 🟡 PARCIAL (28 jun 2026, commit 4c9ed37)
+- [x] **JSON-LD estático en `index.html`** (`Organization` + `WebSite`): va en el HTML CRUDO, así que
+      lo ven TODOS los crawlers y bots de IA que NO ejecutan JS, en todas las rutas. Da gran parte del
+      beneficio de un prerender con riesgo CERO. Se quitó el `Organization` dinámico de `Index.tsx`
+      para no duplicar. Verificado: 2 bloques JSON-LD en el HTML de la home en producción.
+- [ ] **Prerender completo con Puppeteer: NO se hizo a propósito.** `vite-plugin-prerender`/`react-snap`
+      corren un navegador headless (Chromium) en el build; eso puede ROMPER el deploy de Vercel (no
+      siempre tiene Chromium) y tumbar el sitio con clientes reales — contra la regla dura de Marlon.
+      Si se quiere, evaluar con supervisión: o un plugin que no requiera Chromium en Vercel, o mover a
+      Next.js SSG (re-arquitectura). Por ahora Google SÍ indexa la SPA (ejecuta JS + react-helmet) y el
+      JSON-LD estático cubre a los bots sin JS.
+- [ ] Validar `title`/`description`/`OG` por ruta para bots sin JS sigue pendiente de un prerender real.
 
 **FASE SEO-3 — Contenido programático: landing pages por hotel y por servicio**
 > Esta es la idea que Marlon recordó ("páginas por cada hotel"). Es el mayor multiplicador de
@@ -1259,6 +1265,28 @@ reiniciado con el código nuevo (health 200, login 200, `/pricing/rules` 404). S
 (`C:\Users\conde\.claude\skills\code-reviewer\`). Es boilerplate: el `code_quality_checker.py` es un stub
 (no analiza) y los `references/*.md` son plantillas placeholder. La revisión/calificación (B+ → mejorada
 con esta fase) se hizo con herramientas reales (ruff/pytest/tsc), no con ese skill.
+
+## Fase 31s — SEO-2 seguro (JSON-LD estático) + CHECKLIST end-to-end 19/19 (28 jun 2026)
+
+**SEO:** Ver "FASE SEO-2" en el plan SEO de arriba — JSON-LD estático en `index.html` (Organization +
+WebSite) para crawlers/IAs sin JS. NO se metió Puppeteer (riesgo de romper el deploy). Commit 4c9ed37.
+
+**CHECKLIST end-to-end contra PRODUCCIÓN — 19/19 OK (script efímero, datos de prueba limpiados):**
+1. ✅ Salud: `/health` 200 (liveness) + `/health/ready` (DB responde SELECT 1).
+2. ✅ Catálogo en DB: 6 áreas, 252 hoteles, 16 extras.
+3. ✅ Reserva pública: 201 sin redirect 307; IVA 16% correcto (recalculado server-side desde el área:
+   subtotal 13000 + IVA 2080 = 15080); persiste en DB (GET recupera).
+4. ✅ Checkout/Stripe: `create-payment-intent` 200 con `client_secret` (cobra el total con IVA).
+5. ✅ Auth admin modo CELULAR: login da `access_token`; `/me` y `/admin/bookings` con SOLO header
+   (sin cookie) → 200; sin auth → 401 (seguridad).
+6. ✅ Reserva manual admin: 201 con IVA (12000 + 1920 = 13920).
+7. ✅ DELETE de reservas → 200 (endpoint nuevo; limpia los datos de prueba).
+8. ✅ SEO: `sitemap.xml` y `robots.txt` accesibles; 2 bloques JSON-LD en el HTML de la home.
+
+**Conclusión:** base de datos, flujo de reservas (público + admin), IVA, pagos, auth móvil, borrado y
+SEO funcionan correctamente en producción. Sin bugs detectados.
+
+---
 
 ## Fase 31r — Fix login admin en celular (cookie cross-site) + auditoría responsive (28 jun 2026)
 
