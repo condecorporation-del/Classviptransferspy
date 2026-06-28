@@ -137,13 +137,18 @@ ruta en build). Opciones, en orden de menor a mayor fricción:
 - [ ] Confirmar que el dominio viejo/histórico (si lo había) hace 301 al nuevo, para no perder
       la autoridad que ya tenía ("antes salía primera").
 
-**FASE SEO-1 — On-page técnico (código, sin tocar UX)**
-- [ ] Title + meta description ÚNICOS y con keyword en CADA ruta pública (audit: Home ✅, verificar
-      Transfers/Activities/Portfolio/Contact/Book tengan keyword local + intención de búsqueda).
-- [ ] Schema adicional: `Service` (cada servicio de transporte), `BreadcrumbList`, `Organization`
-      con `logo`/`sameAs` (redes), y `Review`/`AggregateRating` con reseñas reales de TripAdvisor.
-- [ ] `<html lang>` dinámico según idioma activo (hoy fijo en `es`; el sitio es bilingüe).
-- [ ] `hreflang` es-MX / en-US si se sirven ambos idiomas en URLs distinguibles.
+**FASE SEO-1 — On-page técnico (código, sin tocar UX)** — 🟡 EN CURSO (28 jun 2026, commit 3329873)
+- [x] **Canonical/JSON-LD consistentes a `www`**: 9 referencias apuntaban a `classviptransfers.com`
+      sin www (Activities/Transfers/Portfolio/Contact/Book) → dividían autoridad. Todas a www.
+- [x] Title + meta description con keyword local: Transfers ("...en Los Cabos · SJD Airport"),
+      Contact ("...Los Cabos 24/7"), Book ("...in Los Cabos"), Portfolio ("Los Cabos Portfolio...").
+      Home/Activities ya estaban bien. (description de Transfers reforzada con "SJD to any hotel").
+- [x] `<html lang>` dinámico según idioma activo (estaba fijo en `es`; el sitio arranca en inglés).
+      `og:locale`/`og:locale:alternate` también dinámicos. Vía Helmet en `SEO.tsx`.
+- [ ] Schema adicional: `BreadcrumbList`, `Organization` con `logo`/`sameAs`. (`Service` ya existe en
+      Transfers/Book; `LocalBusiness`+`FAQPage`+`AggregateRating` ya en Home.)
+- [ ] `hreflang` es-MX / en-US (requiere URLs distinguibles por idioma — hoy el idioma es client-side
+      con localStorage, no por URL; evaluar en FASE SEO-2 con prerender).
 - [ ] Alt text descriptivo con keywords en TODAS las imágenes (hero, flota, hoteles).
 - [ ] Imágenes en formato moderno (Cloudinary ya puede servir `f_auto,q_auto` → WebP/AVIF).
 - [ ] Verificar Core Web Vitals reales con PageSpeed Insights (LCP < 2.5s, CLS < 0.1, INP < 200ms).
