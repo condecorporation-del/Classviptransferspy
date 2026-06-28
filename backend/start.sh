@@ -11,7 +11,7 @@ alembic upgrade head
 echo "==> Asegurando usuario admin"
 python scripts/ensure_admin.py
 
-echo "==> Iniciando uvicorn en 0.0.0.0:${PORT:-8000} (${WEB_CONCURRENCY:-2} workers)"
+echo "==> Iniciando servidor uvicorn en 0.0.0.0:${PORT:-8000} (${WEB_CONCURRENCY:-2} workers)"
 exec uvicorn app.main:app \
   --host 0.0.0.0 \
   --port "${PORT:-8000}" \
