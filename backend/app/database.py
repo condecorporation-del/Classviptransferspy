@@ -1,3 +1,4 @@
+from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 from uuid import uuid4
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
@@ -11,11 +12,18 @@ settings = get_settings()
 # Railway (y otras plataformas) inyectan DATABASE_URL con prefijo postgresql://
 # o postgres:// sin especificar el driver. create_async_engine requiere
 # postgresql+asyncpg://. Si el prefijo no lo incluye, lo corregimos aquí.
+# También eliminamos parámetros que asyncpg no acepta (ej. pgbouncer=true de
+# Supabase Session Pooler — asyncpg los pasaría como kwargs a connect() y explota).
 def _asyncpg_url(url: str) -> str:
     for prefix in ("postgresql://", "postgres://"):
         if url.startswith(prefix):
-            return "postgresql+asyncpg://" + url[len(prefix):]
-    return url
+            url = "postgresql+asyncpg://" + url[len(prefix):]
+            break
+    parsed = urlparse(url)
+    params = parse_qs(parsed.query)
+    params.pop("pgbouncer", None)
+    clean_query = urlencode({k: v[0] for k, v in params.items()})
+    return urlunparse(parsed._replace(query=clean_query))
 
 _database_url = _asyncpg_url(settings.database_url)
 

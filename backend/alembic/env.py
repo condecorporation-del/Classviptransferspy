@@ -1,5 +1,6 @@
 import asyncio
 from logging.config import fileConfig
+from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import create_async_engine
@@ -31,8 +32,13 @@ target_metadata = Base.metadata
 def _asyncpg_url(url: str) -> str:
     for prefix in ("postgresql://", "postgres://"):
         if url.startswith(prefix):
-            return "postgresql+asyncpg://" + url[len(prefix):]
-    return url
+            url = "postgresql+asyncpg://" + url[len(prefix):]
+            break
+    parsed = urlparse(url)
+    params = parse_qs(parsed.query)
+    params.pop("pgbouncer", None)
+    clean_query = urlencode({k: v[0] for k, v in params.items()})
+    return urlunparse(parsed._replace(query=clean_query))
 
 _settings = get_settings()
 _raw_url = _settings.database_url_direct or _settings.database_url
