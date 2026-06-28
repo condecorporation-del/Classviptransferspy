@@ -41,6 +41,11 @@ class AdminAuthMiddleware(BaseHTTPMiddleware):
     """
 
     async def dispatch(self, request: Request, call_next):
+        # Los preflights CORS (OPTIONS) nunca llevan cookie — dejarlos pasar
+        # para que CORSMiddleware los responda con los headers correctos.
+        if request.method == "OPTIONS":
+            return await call_next(request)
+
         # Inicializar sin autenticación
         request.state.admin_email = None
 
