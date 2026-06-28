@@ -59,7 +59,11 @@ async def login(
             # plano, así que el login "funciona" pero ninguna ruta protegida
             # vuelve a ver la cookie — login parece exitoso y nada más jala.
             secure=settings.environment == "production",
-            samesite="lax",  # Protege contra CSRF básico
+            # Frontend (Vercel) y backend (Railway) son dominios distintos.
+            # samesite="none" + secure=True es obligatorio para que el navegador
+            # envíe la cookie en requests cross-origin. En dev se usa "lax"
+            # porque no hay HTTPS y "none" requiere secure=True.
+            samesite="none" if settings.environment == "production" else "lax",
             max_age=28800,  # 8 horas en segundos
             path="/",
         )
@@ -90,7 +94,12 @@ async def me(admin_email: str = Depends(get_current_admin)):
 async def logout():
     """POST /api/v1/auth/logout — Elimina la cookie admin_token."""
     response = JSONResponse(content={"message": "Sesión cerrada"})
-    response.delete_cookie(key="admin_token", path="/")
+    response.delete_cookie(
+        key="admin_token",
+        path="/",
+        secure=settings.environment == "production",
+        samesite="none" if settings.environment == "production" else "lax",
+    )
     return response
 
 
