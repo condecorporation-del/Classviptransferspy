@@ -57,11 +57,30 @@ app = FastAPI(
 )
 
 
-# ─── CORS ─────────────────────────────────────────────────────────────────────
-# Permite que el frontend (en otro puerto/dominio) haga requests a la API.
-# Sin CORS, el navegador bloquea las llamadas cross-origin.
-# Se agregan automáticamente FRONTEND_URL y localhost de dev a la lista para
-# no depender de que ALLOWED_ORIGINS esté perfectamente formateado.
+# ─── Middleware order ─────────────────────────────────────────────────────────
+# En Starlette, add_middleware() apila de adentro hacia afuera: el ÚLTIMO que
+# se agrega es el PRIMERO en ejecutarse para cada request. El orden correcto:
+#
+#   Request → CORS → SlowAPI → AdminAuth → SecurityHeaders → Routes
+#
+# CORS debe ser el más externo para que los preflights OPTIONS de cualquier
+# ruta (incluso /admin/*) sean respondidos antes de que auth o rate-limit los
+# intercepten. Por eso se agrega AL FINAL (aquí abajo, no arriba).
+
+# ─── Security Headers ─────────────────────────────────────────────────────────
+app.add_middleware(SecurityHeadersMiddleware, hsts=(settings.environment == "production"))
+
+# ─── Auth Middleware ──────────────────────────────────────────────────────────
+app.add_middleware(AdminAuthMiddleware)
+
+# ─── Rate Limiting ────────────────────────────────────────────────────────────
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+app.add_middleware(SlowAPIMiddleware)
+
+# ─── CORS — debe ser el último en agregarse (primero en ejecutarse) ───────────
+# Se agregan FRONTEND_URL y localhost automáticamente para no depender de que
+# ALLOWED_ORIGINS esté perfectamente formateado.
 _extra = {settings.frontend_url.rstrip("/")} if settings.frontend_url else set()
 origins = list(
     {o.strip().rstrip("/") for o in settings.allowed_origins.split(",") if o.strip()}
@@ -72,24 +91,10 @@ origins = list(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
-    allow_credentials=True,  # Permite cookies cross-origin (necesario para auth)
-    allow_methods=["*"],  # GET, POST, PUT, DELETE, PATCH, OPTIONS
-    allow_headers=["*"],  # Content-Type, Authorization, etc.
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
-
-# ─── Security Headers ─────────────────────────────────────────────────────────
-# HSTS solo en producción (en dev se sirve por HTTP plano).
-app.add_middleware(SecurityHeadersMiddleware, hsts=(settings.environment == "production"))
-
-# ─── Auth Middleware ──────────────────────────────────────────────────────────
-app.add_middleware(AdminAuthMiddleware)
-
-# ─── Rate Limiting ────────────────────────────────────────────────────────────
-# Anti fuerza bruta en /auth/login y anti spam en /bookings (público, sin auth).
-# Los límites concretos están en cada endpoint (ver auth.py y bookings.py).
-app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
-app.add_middleware(SlowAPIMiddleware)
 
 
 # ─── IntegrityError → 409 ─────────────────────────────────────────────────────
