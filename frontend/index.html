@@ -48,6 +48,54 @@
     </noscript>
 
     <title>ClassVIP Transfers — Transportación de Lujo en Los Cabos</title>
+
+    <!--
+      JSON-LD ESTÁTICO (identidad del negocio) en el HTML crudo: lo ven TODOS los
+      crawlers, incluidos los bots sociales y de IA (ChatGPT/Perplexity/Google AI)
+      que NO ejecutan JavaScript. La home además inyecta LocalBusiness + FAQPage
+      vía react-helmet para los que sí ejecutan JS. Esto da el 90% del beneficio
+      de un prerender SIN el riesgo de meter Puppeteer al build (que puede romper
+      el deploy). Mantener sincronizado con los datos del negocio.
+    -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Class VIP Transfers",
+      "alternateName": "ClassVIP Transfers Los Cabos",
+      "url": "https://www.classviptransfers.com",
+      "logo": "https://www.classviptransfers.com/favicon.png",
+      "description": "Luxury private airport transportation and adventure tours in Los Cabos, Mexico. 30+ years of experience serving 250+ hotels from SJD Airport.",
+      "telephone": "+526241222174",
+      "email": "Armando@classviptransfers.com",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Los Cabos",
+        "addressRegion": "Baja California Sur",
+        "addressCountry": "MX"
+      },
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "+526241222174",
+        "contactType": "reservations",
+        "areaServed": "MX",
+        "availableLanguage": ["English", "Spanish"]
+      },
+      "sameAs": [
+        "https://wa.me/5216241222174",
+        "https://www.tripadvisor.com.mx/Attraction_Review-g152515-d10486878-Reviews-Class_VIP_Transfers-Cabo_San_Lucas_Los_Cabos_Baja_California.html"
+      ]
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Class VIP Transfers",
+      "url": "https://www.classviptransfers.com",
+      "inLanguage": ["en", "es"]
+    }
+    </script>
   </head>
   <body>
     <div id="root"></div>

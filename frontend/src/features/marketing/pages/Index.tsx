@@ -88,30 +88,9 @@ const Index = () => {
     openingHoursSpecification: { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'], opens: '00:00', closes: '23:59' },
   };
 
-  // Organization: identidad de marca para el Knowledge Graph de Google y las IAs.
-  // `logo` es lo que Google usa para mostrar el logo en resultados; `sameAs`
-  // vincula los perfiles sociales/reseñas.
-  const organizationLd = {
-    '@context': 'https://schema.org',
-    '@type': 'Organization',
-    name: 'Class VIP Transfers',
-    alternateName: 'ClassVIP Transfers Los Cabos',
-    url: 'https://www.classviptransfers.com',
-    logo: cloudinaryAssets.logo,
-    description: 'Luxury private airport transportation and adventure tours in Los Cabos, Mexico. 30+ years of experience serving 250+ hotels from SJD Airport.',
-    contactPoint: {
-      '@type': 'ContactPoint',
-      telephone: '+526241222174',
-      contactType: 'reservations',
-      areaServed: 'MX',
-      availableLanguage: ['English', 'Spanish'],
-    },
-    sameAs: [
-      'https://wa.me/5216241222174',
-      'https://www.tripadvisor.com.mx/Attraction_Review-g152515-d10486878-Reviews-Class_VIP_Transfers-Cabo_San_Lucas_Los_Cabos_Baja_California.html',
-    ],
-  };
-
+  // Organization (identidad de marca) ahora vive ESTÁTICO en index.html para que
+  // también lo vean los crawlers sin JS / IAs. Aquí quedan solo LocalBusiness
+  // (arriba) y FAQPage, que son específicos de la home.
   const faqLd = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
@@ -130,7 +109,7 @@ const Index = () => {
         description="Premium private transportation from Los Cabos Airport (SJD) to any hotel. 30 years of experience. TripAdvisor Certificate of Excellence. Book direct - best rates guaranteed."
         keywords="cabo airport transfer, sjd airport transportation, cabo san lucas transfer, private transportation los cabos, Class VIP Transfers, luxury transfer cabo, cabo adventure tours"
         canonical="https://www.classviptransfers.com/"
-        jsonLd={[localBusinessLd, organizationLd, faqLd]}
+        jsonLd={[localBusinessLd, faqLd]}
       />
       {/* ===== HERO (dark cinematic) ===== */}
       <section className="relative h-screen min-h-[700px] overflow-hidden">
