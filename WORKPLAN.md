@@ -1266,6 +1266,33 @@ reiniciado con el código nuevo (health 200, login 200, `/pricing/rules` 404). S
 (no analiza) y los `references/*.md` son plantillas placeholder. La revisión/calificación (B+ → mejorada
 con esta fase) se hizo con herramientas reales (ruff/pytest/tsc), no con ese skill.
 
+## Fase 31u — Legibilidad GLOBAL de inputs en el admin (fin del texto negro) (28 jun 2026)
+
+**Síntoma (Marlon, +10 veces):** al escribir en cualquier campo del admin (ej. crear una cuenta abierta
+y teclear los datos del cliente) el texto salía NEGRO e ilegible sobre el fondo navy. Se repetía con
+CADA función nueva.
+
+**Causa raíz:** los inputs del admin usan `bg-white/[0.05]` (fondo oscuro) pero NO declaran color de
+texto, así que el texto hereda negro. Cada input nuevo nacía sin `text-white`.
+
+**Fix de raíz (no parche por input):** clase `admin-panel` en el root de `Admin.tsx` + regla CSS GLOBAL
+en `index.css`:
+```css
+.admin-panel input, .admin-panel textarea, .admin-panel select { color: #f1f5f9; caret-color: #f1f5f9; }
+.admin-panel input::placeholder, .admin-panel textarea::placeholder { color: rgba(241,245,249,0.45); }
+.admin-panel select option { color: #0f172a; background:#fff; }  /* dropdown va sobre blanco del SO */
+```
+Especificidad `(0,1,1)` → gana sobre `.text-white`/`.text-foreground`, así que cubre TODO campo del
+admin, incluso los de funciones futuras, automáticamente. Verificado: el admin no tiene inputs con
+fondo claro ni modales con portal (todo es inline bajo `.admin-panel`). Desplegado en producción.
+
+> ⚠️ **REGLA PARA AGENTES FUTUROS:** el panel admin (`.admin-panel`) ya fuerza texto claro en todos los
+> inputs. NO hace falta agregar `text-white` a cada input nuevo. Si algún día se agrega un formulario en
+> un PORTAL/Dialog (fuera del DOM de `.admin-panel`), hay que envolverlo con la clase `admin-panel` o
+> repetir la regla, porque el CSS está scopeado a ese contenedor.
+
+---
+
 ## Fase 31t — Piernas LLEGADA/SALIDA (con fecha de salida) en pantallas de confirmación (28 jun 2026)
 
 **Síntoma (Marlon, reportado varias veces):** en las confirmaciones de un round trip no se veía la
