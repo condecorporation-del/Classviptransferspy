@@ -1266,6 +1266,35 @@ reiniciado con el código nuevo (health 200, login 200, `/pricing/rules` 404). S
 (no analiza) y los `references/*.md` son plantillas placeholder. La revisión/calificación (B+ → mejorada
 con esta fase) se hizo con herramientas reales (ruff/pytest/tsc), no con ese skill.
 
+## Fase 31t — Piernas LLEGADA/SALIDA (con fecha de salida) en pantallas de confirmación (28 jun 2026)
+
+**Síntoma (Marlon, reportado varias veces):** en las confirmaciones de un round trip no se veía la
+**fecha de salida** ni el detalle por pierna (llegada vs salida con vuelos, pickup y ruta). "La salida
+no tiene fecha de salida, ¿cómo voy a saber qué día se va el cliente?"
+
+**Diagnóstico (verificado creando un round trip REAL en producción):** el backend y los CORREOS están
+CORRECTOS — `metadata.departureDate` se guarda y `build_operation_legs` + `leg_block.html` producen
+ambas piernas con fechas distintas (LLEGADA 10-sep / SALIDA 17-sep, pickup, vuelos, ruta). El problema
+era SOLO las **pantallas de confirmación del sitio** (`Confirmation.tsx`, `CheckoutSuccess.tsx`): solo
+mostraban referencia, estado y total — NO las piernas. Marlon estaba viendo la pantalla, no el correo.
+
+**Fix (frontend):**
+- `booking-api.ts`: `ApiBooking` + `mapBookingResponse` ahora exponen los campos operativos
+  (`tripType`, `route`, `flightNumber`, `arrivalTime/Airline`, `departureFlightNumber/Time/Airline`) y
+  `departureDate` (extraído de `metadata.departureDate`).
+- `booking-legs.ts` (nuevo): `buildBookingLegs()` — espejo EXACTO de `build_operation_legs` del backend.
+- `BookingLegs.tsx` (nuevo): renderiza cada pierna con fecha, hora de pickup, ruta origen→destino,
+  vuelo y aerolínea. Round trip → LLEGADA (aeropuerto→hotel) + SALIDA (hotel→aeropuerto, fecha de
+  salida real).
+- `Confirmation.tsx` y `CheckoutSuccess.tsx`: renderizan las piernas + LISTAN los conceptos (traslado,
+  extras, actividades) con nombre/cantidad/precio (antes no se especificaban los items).
+
+**Pendiente/duda:** Marlon mencionó "especificado una zona para los extras/actividades". Interpretado
+como "listar los extras/actividades en la confirmación" (hecho). Si quería además mostrar la ZONA/área
+de cada actividad, falta confirmar el dato exacto que quiere (las actividades hoy no guardan zona).
+
+---
+
 ## Fase 31s — SEO-2 seguro (JSON-LD estático) + CHECKLIST end-to-end 19/19 (28 jun 2026)
 
 **SEO:** Ver "FASE SEO-2" en el plan SEO de arriba — JSON-LD estático en `index.html` (Organization +
