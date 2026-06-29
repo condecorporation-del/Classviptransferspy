@@ -131,6 +131,17 @@ const Confirmation = () => {
               <div className="pt-2">
                 <BookingLegs booking={booking} lang={lang === 'es' ? 'es' : 'en'} />
               </div>
+              {/* Conceptos: traslado, extras y actividades, cada uno especificado */}
+              {booking.items.length > 0 && (
+                <div className="pt-1 space-y-0.5">
+                  {booking.items.map((it, idx) => (
+                    <p key={idx} className="flex items-center justify-between gap-3">
+                      <span className="text-muted-foreground">{it.name}{it.quantity > 1 ? ` × ${it.quantity}` : ''}</span>
+                      <span className="font-medium">${((it.totalPrice ?? 0) / 100).toFixed(2)}</span>
+                    </p>
+                  ))}
+                </div>
+              )}
               {taxCents > 0 && (
                 <>
                   <p>

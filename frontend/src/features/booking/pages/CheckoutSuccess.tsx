@@ -90,6 +90,18 @@ export default function CheckoutSuccess() {
               <BookingLegs booking={booking} lang={lang === 'es' ? 'es' : 'en'} />
             </div>
 
+            {/* Conceptos (traslado, extras, actividades) — cada uno especificado */}
+            {booking.items.length > 0 && (
+              <div className="pt-3 border-t border-border space-y-1.5">
+                {booking.items.map((it, idx) => (
+                  <div key={idx} className="flex items-center justify-between gap-4 text-sm">
+                    <span className="text-muted-foreground">{it.name}{it.quantity > 1 ? ` × ${it.quantity}` : ''}</span>
+                    <span className="text-foreground">${((it.totalPrice ?? 0) / 100).toFixed(2)}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
             {/* Desglose de precio con IVA */}
             {booking.taxAmount > 0 && (
               <>
