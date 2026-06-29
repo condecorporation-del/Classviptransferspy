@@ -854,7 +854,7 @@ const Admin = () => {
           <img
             src={cloudinaryAssets.logo}
             alt="Class VIP Transfers"
-            className="h-10 w-auto object-contain"
+            className="h-20 w-auto object-contain"
           />
           <p className="mt-2 text-[10px] font-bold uppercase tracking-[0.18em] text-white/40">Panel de Administración</p>
         </div>

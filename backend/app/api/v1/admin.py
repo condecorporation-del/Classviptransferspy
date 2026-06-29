@@ -276,6 +276,32 @@ async def mark_booking_paid(
 
 
 @router.post(
+    "/bookings/{booking_id}/mark-unpaid",
+    response_model=BookingResponse,
+    summary="Revertir pago offline — vuelve a CONFIRMED",
+)
+async def mark_booking_unpaid(
+    booking_id: str,
+    db: AsyncSession = Depends(get_db),
+    admin: str = Depends(get_current_admin),
+):
+    """POST /api/v1/admin/bookings/{booking_id}/mark-unpaid (requiere auth).
+
+    Revierte mark-paid: pone la reserva en CONFIRMED y anula el pago manual.
+    Solo aplica a reservas PAID con cobro registrado manualmente (efectivo/transferencia).
+    """
+    service = BookingService(db)
+    try:
+        booking = await service.mark_unpaid(booking_id)
+    except NotFoundError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=e.message)
+    except InvalidBookingStateError as e:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=e.message)
+    await _audit(db, admin, AuditAction.PAYMENT, booking_id, "Revirtió pago: PAID → CONFIRMED")
+    return booking
+
+
+@router.post(
     "/bookings/{booking_id}/cancel",
     response_model=BookingResponse,
     summary="Cancelar una reserva",

@@ -1114,8 +1114,6 @@ function BookingDetailView({
   };
 
   const markPaid = async () => {
-    // Se pregunta el método de cobro para que el pago quede bien clasificado en
-    // Finanzas. El monto registrado es el total de la reserva (caso normal).
     const choice = window.prompt(
       'Marcar como PAGADO — método de cobro:\n\n  1 = Efectivo\n  2 = Transferencia\n  3 = Tarjeta / Terminal\n\nEscribe 1, 2 o 3:',
       '1',
@@ -1128,6 +1126,16 @@ function BookingDetailView({
       const { ok, error } = await doPost(`/api/v1/admin/bookings/${booking.id}/mark-paid`, { method });
       if (ok) { flash('Reserva marcada como PAGADA'); onRefresh(); onRefetchDetail(); }
       else flash(error || 'No se pudo marcar como pagada', true);
+    } finally { setBusy(null); }
+  };
+
+  const markUnpaid = async () => {
+    if (!confirm('¿Revertir pago? La reserva quedará como CONFIRMADA y el cobro manual se anulará.')) return;
+    setBusy('markunpaid');
+    try {
+      const { ok, error } = await doPost(`/api/v1/admin/bookings/${booking.id}/mark-unpaid`);
+      if (ok) { flash('Pago revertido — reserva marcada como CONFIRMADA'); onRefresh(); onRefetchDetail(); }
+      else flash(error || 'No se pudo revertir el pago', true);
     } finally { setBusy(null); }
   };
 
@@ -1332,6 +1340,16 @@ function BookingDetailView({
                 className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gold text-navy hover:opacity-90 disabled:opacity-50 text-sm font-semibold transition-colors"
               >
                 <BadgeDollarSign size={13} /> {busy === 'markpaid' ? 'Guardando...' : 'Marcar pagado'}
+              </button>
+            )}
+            {booking.status === 'PAID' && (
+              <button
+                onClick={markUnpaid}
+                disabled={busy === 'markunpaid'}
+                title="Revertir pago offline — la reserva vuelve a CONFIRMADA"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 disabled:opacity-50 text-sm font-medium transition-colors"
+              >
+                <BadgeDollarSign size={13} /> {busy === 'markunpaid' ? 'Revirtiendo...' : 'Marcar no pagado'}
               </button>
             )}
             {!['CANCELLED', 'COMPLETED'].includes(booking.status) && (

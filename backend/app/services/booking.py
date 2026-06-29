@@ -669,6 +669,27 @@ class BookingService:
         await self.db.commit()
         return await self.get_by_id(booking_id)
 
+    async def mark_unpaid(self, booking_id: str) -> Booking:
+        """Revierte una reserva PAID → CONFIRMED y anula el pago manual.
+
+        Solo opera sobre pagos creados con provider=MANUAL (mark_paid offline).
+        Pagos de Stripe no se tocan: si el cliente pagó por Stripe hay que
+        procesarlo por Stripe primero antes de revertir el estado.
+        """
+        booking = await self.get_by_id(booking_id)
+
+        if booking.status != BookingStatus.PAID:
+            raise InvalidBookingStateError(booking_id, booking.status.value, "PAID")
+
+        # Anular pagos manuales COMPLETED registrados con mark_paid
+        for payment in booking.payments:
+            if payment.provider == PaymentProvider.MANUAL and payment.status == PaymentStatus.COMPLETED:
+                payment.status = PaymentStatus.CANCELLED
+
+        booking.status = BookingStatus.CONFIRMED
+        await self.db.commit()
+        return await self.get_by_id(booking_id)
+
     # ─── UPDATE ──────────────────────────────────────────────
 
     async def update(self, booking_id: str, data: UpdateBookingRequest) -> Booking:
