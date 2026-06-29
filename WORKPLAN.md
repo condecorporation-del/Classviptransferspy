@@ -1357,6 +1357,14 @@ IVA 1760 = total 12760; Stripe cobra 12760).
 **Nota:** `create_manual` (admin) también aplica IVA, por consistencia. Si el admin alguna vez debe
 ingresar precios IVA-incluido, habría que ajustar ese flujo — pendiente de decisión si surge.
 
+**Fix de visibilidad (28 jun 2026, commit 03b8843):** Marlon reportó que el total subía 16% pero el
+IVA NO se veía especificado en el flujo. La primera pasada agregó el desglose a Checkout/Confirmation,
+pero faltaba en 3 lugares MUY visibles: (1) el **resumen sticky** de `Book.tsx` mostraba el subtotal
+como "Total" sin línea de IVA; (2) el **botón "Pagar Ahora"** mostraba el subtotal (mismatch con el
+cobro real); (3) la pantalla **"Reserva Confirmada"** (`CheckoutSuccess.tsx`) no mostraba NINGÚN
+precio. Corregidos: los 3 ahora muestran Subtotal + IVA (16%) + Total con `grandTotal`. Verificado:
+los 4 chunks (Book/Checkout/CheckoutSuccess/Confirmation) contienen el desglose de IVA en producción.
+
 ---
 
 ## Fase 31p — Email de confirmación tras el pago (no dependía del webhook) (28 jun 2026)
