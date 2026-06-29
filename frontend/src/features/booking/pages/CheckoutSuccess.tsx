@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowRight, CheckCircle, Loader2 } from 'lucide-react';
 import { useLanguage } from '@/shared/providers/LanguageContext';
 import { fetchBooking, type ApiBooking } from '@/features/booking/lib/booking-api';
+import { BookingLegs } from '@/features/booking/components/BookingLegs';
 
 type BookingSummary = ApiBooking;
 
@@ -79,6 +80,14 @@ export default function CheckoutSuccess() {
               <span className="font-semibold text-emerald-600">
                 {STATUS_LABELS[booking.status]?.[lang === 'es' ? 'es' : 'en'] || booking.status}
               </span>
+            </div>
+
+            {/* Piernas del servicio (LLEGADA / SALIDA con fechas, vuelos, pickup) */}
+            <div className="pt-3 border-t border-border">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-2">
+                {lang === 'es' ? 'Detalle del servicio' : 'Service details'}
+              </p>
+              <BookingLegs booking={booking} lang={lang === 'es' ? 'es' : 'en'} />
             </div>
 
             {/* Desglose de precio con IVA */}

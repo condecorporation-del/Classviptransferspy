@@ -5,6 +5,7 @@ import { format } from 'date-fns';
 import { AlertCircle, CheckCircle, Loader2, MessageCircle, Phone } from 'lucide-react';
 import { useLanguage } from '@/shared/providers/LanguageContext';
 import { fetchBooking, type ApiBooking } from '@/features/booking/lib/booking-api';
+import { BookingLegs } from '@/features/booking/components/BookingLegs';
 
 type ConfirmationBooking = ApiBooking;
 
@@ -88,8 +89,6 @@ const Confirmation = () => {
   const bookingDate = booking?.bookingDate ? format(new Date(booking.bookingDate), 'PPP') : null;
   const reference = booking?.confirmationCode || (booking?.id ? `#CVT-${booking.id.slice(-8).toUpperCase()}` : null);
   const status = booking?.status || 'CONFIRMED';
-  const pickup = booking?.pickupLocation || '';
-  const dropoff = booking?.dropoffLocation || '';
   const totalCents = booking?.totalAmountCents ?? booking?.totalAmount ?? 0;
   const total = (totalCents / 100).toFixed(2);
   const taxCents = booking?.taxAmount ?? 0;
@@ -126,16 +125,12 @@ const Confirmation = () => {
                   {t('confirm.date')}: <span className="font-medium">{bookingDate}</span>
                 </p>
               )}
-              {pickup && (
-                <p>
-                  {lang === 'es' ? 'Recogida' : 'Pickup'}: <span className="font-medium">{pickup}</span>
-                </p>
-              )}
-              {dropoff && (
-                <p>
-                  {lang === 'es' ? 'Destino' : 'Dropoff'}: <span className="font-medium">{dropoff}</span>
-                </p>
-              )}
+              {/* Piernas del servicio: para round trips muestra LLEGADA y SALIDA con
+                  sus fechas distintas, vuelos, hora de pickup y ruta origen→destino.
+                  Reemplaza las líneas sueltas de pickup/dropoff. */}
+              <div className="pt-2">
+                <BookingLegs booking={booking} lang={lang === 'es' ? 'es' : 'en'} />
+              </div>
               {taxCents > 0 && (
                 <>
                   <p>

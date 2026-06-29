@@ -38,6 +38,17 @@ export type ApiBooking = {
   /** IVA en centavos. */
   taxAmount: number;
   passengers?: number;
+  // ─── Datos operativos para reconstruir las piernas (LLEGADA / SALIDA) ───
+  tripType?: string | null;
+  route?: string | null;
+  flightNumber?: string | null;
+  arrivalTime?: string | null;
+  arrivalAirline?: string | null;
+  departureFlightNumber?: string | null;
+  departureTime?: string | null;
+  departureAirline?: string | null;
+  /** Fecha de salida de un round trip (de metadata.departureDate, YYYY-MM-DD). */
+  departureDate?: string | null;
   customer?: { name: string; email: string; phone: string } | null;
   items: ApiBookingItem[];
 };
@@ -68,6 +79,15 @@ interface RawBooking {
   subtotal_amount?: number | null;
   tax_amount?: number | null;
   passengers?: number;
+  trip_type?: string | null;
+  route?: string | null;
+  flight_number?: string | null;
+  arrival_time?: string | null;
+  arrival_airline?: string | null;
+  departure_flight_number?: string | null;
+  departure_time?: string | null;
+  departure_airline?: string | null;
+  metadata?: { departureDate?: string | null } | null;
   customer?: { name: string; email: string; phone: string } | null;
   items?: RawBookingItem[];
 }
@@ -93,6 +113,15 @@ export function mapBookingResponse(raw: RawBooking): ApiBooking {
     subtotalAmount: subtotalCents,
     taxAmount: taxCents,
     passengers: raw?.passengers,
+    tripType: raw?.trip_type ?? null,
+    route: raw?.route ?? null,
+    flightNumber: raw?.flight_number ?? null,
+    arrivalTime: raw?.arrival_time ?? null,
+    arrivalAirline: raw?.arrival_airline ?? null,
+    departureFlightNumber: raw?.departure_flight_number ?? null,
+    departureTime: raw?.departure_time ?? null,
+    departureAirline: raw?.departure_airline ?? null,
+    departureDate: raw?.metadata?.departureDate ?? null,
     customer: raw?.customer ?? null,
     items: (raw?.items ?? []).map((it: RawBookingItem) => ({
       id: it?.id ?? '',
