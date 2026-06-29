@@ -1289,9 +1289,19 @@ mostraban referencia, estado y total — NO las piernas. Marlon estaba viendo la
 - `Confirmation.tsx` y `CheckoutSuccess.tsx`: renderizan las piernas + LISTAN los conceptos (traslado,
   extras, actividades) con nombre/cantidad/precio (antes no se especificaban los items).
 
-**Pendiente/duda:** Marlon mencionó "especificado una zona para los extras/actividades". Interpretado
-como "listar los extras/actividades en la confirmación" (hecho). Si quería además mostrar la ZONA/área
-de cada actividad, falta confirmar el dato exacto que quiere (las actividades hoy no guardan zona).
+**Fix BUG del admin (mismo día):** Marlon reportó que las reservas creadas DESDE EL ADMIN no mostraban
+la información en el correo. Causa: el endpoint `create_manual_booking` (admin.py) construía un dict
+MÍNIMO a mano para el correo (sin `trip_type`, `route`, `metadata`/departureDate, vuelos de salida,
+`items`, ni `subtotal/tax`). Por eso las reservas del admin salían sin piernas, sin items y sin IVA.
+**Fix:** usar `_booking_to_dict(booking)` (el mismo convertidor del flujo público). Verificado en
+producción: admin round trip → ambas piernas con fechas distintas (5-nov/12-nov) + items + IVA.
+
+**Consistencia pending vs confirmación (verificado):** render local de `customer_pending.html` y
+`customer_confirmed.html` con el mismo booking → AMBOS muestran SALIDA, fecha de salida, vuelo de
+salida, los items (traslado + extras) y "IVA (16%)". La info es idéntica en los dos correos.
+
+**Conclusión:** flujo público Y admin ahora muestran el detalle completo (piernas LLEGADA/SALIDA con
+fechas, vuelos, pickup, ruta; items; IVA) de forma consistente en pantalla y en ambos correos.
 
 ---
 
