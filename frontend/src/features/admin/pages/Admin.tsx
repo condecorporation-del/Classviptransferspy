@@ -736,7 +736,7 @@ const Admin = () => {
   const activeLabel = sidebarItems.find(s => s.id === activeTab)?.label || 'Admin';
 
   return (
-    <div className="min-h-[100dvh] flex flex-col md:flex-row" style={{ background: 'linear-gradient(160deg, #07112e 0%, #0c1c3d 55%, #07112e 100%)', backgroundAttachment: 'fixed' }}>
+    <div className="admin-panel min-h-[100dvh] flex flex-col md:flex-row" style={{ background: 'linear-gradient(160deg, #07112e 0%, #0c1c3d 55%, #07112e 100%)', backgroundAttachment: 'fixed' }}>
 
       {/* ═══ Mobile: Top header ═══ */}
       <div className="md:hidden sticky top-0 z-30 flex items-center justify-between px-4 py-3 border-b border-gold/10 bg-[#07112e]/90 backdrop-blur-xl"

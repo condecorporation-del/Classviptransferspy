@@ -266,3 +266,32 @@
   border-color: hsl(var(--gold) / 0.6);
   box-shadow: 0 8px 30px -6px hsl(var(--gold) / 0.15);
 }
+
+/* ─── Admin: legibilidad GLOBAL de campos ─────────────────────────────────────
+   El panel admin tiene fondo oscuro (navy). Muchos inputs declaran un bg
+   translúcido pero NO un color de texto, así que el texto que se escribe salía
+   NEGRO e ilegible. Esta regla fuerza texto CLARO en todo input/textarea/select
+   dentro de `.admin-panel`, para que CUALQUIER campo —incluso los de funciones
+   nuevas— sea legible automáticamente, sin tener que agregar `text-white` uno por
+   uno. (Verificado: el admin no tiene inputs con fondo claro que esto rompa.) */
+.admin-panel input,
+.admin-panel textarea,
+.admin-panel select {
+  color: #f1f5f9;          /* slate-100 — claro sobre el navy */
+  caret-color: #f1f5f9;
+}
+.admin-panel input::placeholder,
+.admin-panel textarea::placeholder {
+  color: rgba(241, 245, 249, 0.45);
+}
+/* El desplegable de un <select> se pinta sobre fondo blanco del SO → texto oscuro. */
+.admin-panel select option {
+  color: #0f172a;
+  background-color: #ffffff;
+}
+/* Inputs de fecha/hora nativos: el ícono del calendario también debe verse. */
+.admin-panel input[type="date"]::-webkit-calendar-picker-indicator,
+.admin-panel input[type="time"]::-webkit-calendar-picker-indicator,
+.admin-panel input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  filter: invert(1) opacity(0.6);
+}
