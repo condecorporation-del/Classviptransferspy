@@ -403,21 +403,15 @@ async def create_manual_booking(
         data.payment_method == "stripe" and data.send_payment_link
     )
     if wants_email:
-        booking_dict = {
-            "id": booking.id,
-            "confirmation_code": booking.confirmation_code,
-            "booking_date": str(booking.booking_date),
-            "booking_time": booking.booking_time,
-            "pickup_location": booking.pickup_location,
-            "dropoff_location": booking.dropoff_location,
-            "flight_number": booking.flight_number,
-            "service_type": booking.service_type,
-            "total_amount": booking.total_amount,
-            "currency": booking.currency,
-            "passengers": booking.passengers,
-            "customer_name": booking.customer.name if booking.customer else "Guest",
-            "customer_email": booking.customer.email if booking.customer else "",
-        }
+        # Usar el MISMO convertidor completo que el flujo público para que el
+        # correo de la reserva manual traiga TODO: piernas LLEGADA/SALIDA (con
+        # fecha de salida del round trip vía metadata), vuelos, pickup, ruta, los
+        # items (extras/actividades) y el desglose subtotal/IVA/total. Antes se
+        # construía un dict mínimo a mano y por eso las reservas del admin no
+        # mostraban ese detalle.
+        from app.api.v1.bookings import _booking_to_dict
+
+        booking_dict = _booking_to_dict(booking)
         try:
             email_service = EmailService()
             if data.payment_method == "cash":
