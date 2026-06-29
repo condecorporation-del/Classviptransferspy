@@ -267,17 +267,20 @@
   box-shadow: 0 8px 30px -6px hsl(var(--gold) / 0.15);
 }
 
-/* ─── Admin: legibilidad GLOBAL de campos ─────────────────────────────────────
-   El panel admin tiene fondo oscuro (navy). Muchos inputs declaran un bg
-   translúcido pero NO un color de texto, así que el texto que se escribe salía
-   NEGRO e ilegible. Esta regla fuerza texto CLARO en todo input/textarea/select
-   dentro de `.admin-panel`, para que CUALQUIER campo —incluso los de funciones
-   nuevas— sea legible automáticamente, sin tener que agregar `text-white` uno por
-   uno. (Verificado: el admin no tiene inputs con fondo claro que esto rompa.) */
+/* ─── Admin: legibilidad GLOBAL ───────────────────────────────────────────────
+   El panel admin tiene fondo oscuro (navy). Sin un color base explícito, el
+   texto de celdas, párrafos, inputs, etc. hereda el color oscuro del body
+   (--foreground) y queda NEGRO e ilegible. Esta regla establece el color por
+   defecto para TODO el admin panel; los colores explícitos (text-gold,
+   text-emerald-300, text-white/55, etc.) siguen funcionando porque son más
+   específicos. Cubre inputs, tablas, párrafos y cualquier elemento futuro. */
+.admin-panel {
+  color: #f1f5f9;          /* slate-100 — claro sobre el navy */
+}
 .admin-panel input,
 .admin-panel textarea,
 .admin-panel select {
-  color: #f1f5f9;          /* slate-100 — claro sobre el navy */
+  color: #f1f5f9;
   caret-color: #f1f5f9;
 }
 .admin-panel input::placeholder,
