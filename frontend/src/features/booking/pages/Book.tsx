@@ -1709,7 +1709,7 @@ const Book = () => {
                     </span>
                   </div>
                   <span className="font-display font-bold text-xl" style={{ color: '#0A1628' }}>
-                    ${Math.round(total)} USD
+                    ${grandTotal.toFixed(2)} USD
                   </span>
                 </div>
                 <div className="py-2 flex items-center justify-center gap-2"
@@ -1974,8 +1974,10 @@ const Book = () => {
                 <div className="border-t border-border pt-4 space-y-2.5">
                   <Row label={t('book.review.transferPrice')} value={`$${Math.round(transferPrice)} USD`} gold />
                   {activitiesPrice > 0 && <Row label={data.comboMode === 'crazy' ? 'Crazy Combo' : data.comboMode === 'combo' ? 'Combo' : lang === 'es' ? 'Actividades' : 'Activities'} value={`$${Math.round(activitiesPrice)} USD`} gold />}
+                  <Row label="Subtotal" value={`$${total.toFixed(2)} USD`} />
+                  <Row label={lang === 'es' ? 'IVA (16%)' : 'Tax · IVA (16%)'} value={`$${ivaAmount.toFixed(2)} USD`} />
                   <div className="border-t-2 border-gold/20 pt-4 mt-2 rounded-xl bg-gold/5 px-4 py-3">
-                    <Row label={t('book.review.total')} value={`$${Math.round(total)} USD`} gold bold />
+                    <Row label={t('book.review.total')} value={`$${grandTotal.toFixed(2)} USD`} gold bold />
                   </div>
                 </div>
               )}

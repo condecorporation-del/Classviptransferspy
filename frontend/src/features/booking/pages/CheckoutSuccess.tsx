@@ -80,6 +80,28 @@ export default function CheckoutSuccess() {
                 {STATUS_LABELS[booking.status]?.[lang === 'es' ? 'es' : 'en'] || booking.status}
               </span>
             </div>
+
+            {/* Desglose de precio con IVA */}
+            {booking.taxAmount > 0 && (
+              <>
+                <div className="flex items-center justify-between gap-4 text-sm pt-3 border-t border-border">
+                  <span className="text-muted-foreground">Subtotal</span>
+                  <span className="text-foreground">${(booking.subtotalAmount / 100).toFixed(2)} USD</span>
+                </div>
+                <div className="flex items-center justify-between gap-4 text-sm">
+                  <span className="text-muted-foreground">
+                    {lang === 'es'
+                      ? `IVA (${Math.round((booking.taxAmount / booking.subtotalAmount) * 100)}%)`
+                      : `Tax · IVA (${Math.round((booking.taxAmount / booking.subtotalAmount) * 100)}%)`}
+                  </span>
+                  <span className="text-foreground">${(booking.taxAmount / 100).toFixed(2)} USD</span>
+                </div>
+              </>
+            )}
+            <div className="flex items-center justify-between gap-4 text-sm pt-2 border-t border-border">
+              <span className="font-bold text-foreground">Total</span>
+              <span className="font-bold text-gold">${(booking.totalAmount / 100).toFixed(2)} USD</span>
+            </div>
           </div>
         )}
 
